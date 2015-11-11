@@ -38,7 +38,15 @@ public class LoginController {
 		boolean success = true;
 
 		if (success) {
+			loginFrame.setVisible(false);
+			loginFrame.dispose();
 
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					JMSUser user = new JMSUser("Admin", "admin");
+					new MainMenuFrame(user);
+				}
+			});
 		} else {
 			// TODO Show user error dialogue
 		}

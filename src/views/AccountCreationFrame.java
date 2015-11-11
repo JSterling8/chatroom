@@ -1,37 +1,25 @@
 package views;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import java.awt.GridBagLayout;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
-import com.jgoodies.forms.layout.ColumnSpec;
+import java.awt.GridBagConstraints;
+import java.awt.BorderLayout;
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
+import javax.swing.JLabel;
 import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import java.awt.FlowLayout;
 
-import controllers.LoginController;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-public class LoginFrame extends JFrame {
-	private static final long serialVersionUID = 1479957234936275504L;
-	private LoginController controller;
-
+public class AccountCreationFrame extends JFrame {
 	private JTextField tfUsername;
 	private JPasswordField pfPassword;
-	
-	public LoginFrame() {
-		controller = new LoginController(this);
-		
+	public AccountCreationFrame() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0};
@@ -59,7 +47,7 @@ public class LoginFrame extends JFrame {
 				FormSpecs.DEFAULT_ROWSPEC,}));
 		
 		JLabel lblUsername = new JLabel("Username");
-		panel_2.add(lblUsername, "1, 2, 2, 1, left, top");
+		panel_2.add(lblUsername, "2, 2, left, top");
 		
 		JLabel lblPassword = new JLabel("Password");
 		panel_2.add(lblPassword, "2, 4");
@@ -85,34 +73,11 @@ public class LoginFrame extends JFrame {
 		JPanel panel_1 = new JPanel();
 		panel.add(panel_1);
 		
+		JButton btnCancel = new JButton("Cancel");
+		panel_1.add(btnCancel);
+		
 		JButton btnCreate = new JButton("Create");
-		btnCreate.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				controller.handleCreateButtonPressed(tfUsername.getText(), pfPassword.getPassword().toString());
-			}
-		});
 		panel_1.add(btnCreate);
-		
-		JButton btnLogin = new JButton("Login");
-		btnLogin.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				controller.handleLoginButtonPressed(tfUsername.getText(), pfPassword.getPassword().toString());
-			}
-		});
-		panel_1.add(btnLogin);
-		
-		setSize(new Dimension(450, 200));
-		setVisible(true);
 	}
-
-	public static void main(String[] args) throws InterruptedException {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				new LoginFrame();
-			}
-		});
-	}
-
+	
 }
