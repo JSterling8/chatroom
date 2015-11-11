@@ -1,26 +1,28 @@
 package models;
 
+import java.util.UUID;
+
 public class Topic {
-	public int id;
+	public UUID id;
 	public String name;
 	public String owner;
-	public int users;
+	public Integer users;
 	
 	public Topic(){
 		
 	}
 	
-	public Topic(int id, String name, String owner, int users){
-		this.id = id;
+	public Topic(String name, String owner, Integer users){
+		this.id = UUID.randomUUID();
 		this.name = name;
 		this.owner = owner;
 		this.users = users;
 	}
 	
-	public int getId() {
+	public UUID getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 	public String getName() {
@@ -38,7 +40,7 @@ public class Topic {
 	public int getUsers() {
 		return users;
 	}
-	public void setUsers(int users) {
+	public void setUsers(Integer users) {
 		this.users = users;
 	}
 	

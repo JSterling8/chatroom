@@ -127,7 +127,7 @@ public class MainMenuFrame extends JFrame {
 		setSize(new Dimension(850, 550));
 		setVisible(true);
 		
-		controller = new MainMenuController(tableModel, user);
+		controller = new MainMenuController(this, tableModel, user);
 	}
 	
 	public MainMenuController getController(){

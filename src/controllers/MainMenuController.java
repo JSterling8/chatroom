@@ -1,30 +1,48 @@
 package controllers;
 
+import java.util.UUID;
+
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
+import org.apache.commons.lang3.StringUtils;
 
 import models.Topic;
 import models.User;
+import views.MainMenuFrame;
 
 public class MainMenuController {
+	private MainMenuFrame frame;
 	private DefaultTableModel tableModel;
 	private User user;
 	
-	public MainMenuController(DefaultTableModel tableModel, User user){
+	public MainMenuController(MainMenuFrame frame, DefaultTableModel tableModel, User user){
+		this.frame = frame;
 		this.tableModel = tableModel;
 		this.user = user;
 	}
 	
 	
-	public void handleCreateButtonPressed(){
-		//TODO Add topic to JavaSpace...
-		
+	public void handleCreateButtonPressed(){		
+		String topicName = JOptionPane.showInputDialog(frame, "Enter a topic name: ");
+		if(StringUtils.isNotBlank(topicName)){
+			createTopic(topicName);
+		}
 	}
 	
-	public void createTopic(Topic topic){
+	public void createTopic(String name){
+		Topic topic = new Topic(name, user.name, 1);
+
 		//TODO Add topic to JavaSpace...
+		boolean success = true;
 		
-		Object[] rowData = {topic.getId(), topic.getName(), topic.getOwner(), topic.getUsers()};
-		tableModel.addRow(rowData);
+		if(success){
+			Object[] rowData = {topic.getId(), topic.getName(), topic.getOwner(), topic.getUsers()};
+			tableModel.addRow(rowData);
+		} else {
+			JOptionPane.showMessageDialog(frame, "Failed to create topic.  Topic name already exists");
+		}
+
 	}
 	
 	public void deleteTopic(Topic topic){
@@ -32,7 +50,7 @@ public class MainMenuController {
 			//TODO Remove topic from JavaSpace
 			
 			for(int i = 0; i < tableModel.getRowCount(); i++){
-				if((int)tableModel.getValueAt(i, 0) == topic.getId()){
+				if((UUID)tableModel.getValueAt(i, 0) == topic.getId()){
 					tableModel.removeRow(i);
 					break;
 				}
