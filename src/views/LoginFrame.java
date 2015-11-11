@@ -13,11 +13,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import controllers.LoginController;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class LoginFrame extends JFrame {
 	private LoginController controller;
 	
 	public LoginFrame() {
+		controller = new LoginController(this);
+
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{35, 48, 129, 46, 0, 0, 0, 0, 0, 126, 0, 0};
 		gridBagLayout.rowHeights = new int[]{20, 23, 0, 0, 0, 0, 0, 0};
@@ -72,6 +76,12 @@ public class LoginFrame extends JFrame {
 		getContentPane().add(btnCreate, gbc_btnCreate);
 		
 		JButton btnLogin = new JButton("Login");
+		btnLogin.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				controller.handleLoginButtonPressed(tfUsername.getText(), passwordField.getPassword().toString());
+			}
+		});
 		GridBagConstraints gbc_btnLogin = new GridBagConstraints();
 		gbc_btnLogin.insets = new Insets(0, 0, 5, 5);
 		gbc_btnLogin.anchor = GridBagConstraints.NORTHEAST;
@@ -82,8 +92,6 @@ public class LoginFrame extends JFrame {
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(588, 202));
-		
-		controller = new LoginController();
 	}
 	
 	public static void main(String[] args) throws InterruptedException{		
