@@ -7,16 +7,16 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang3.StringUtils;
 
-import models.Topic;
-import models.User;
+import models.JMSTopic;
+import models.JMSUser;
 import views.MainMenuFrame;
 
 public class MainMenuController {
 	private MainMenuFrame frame;
 	private DefaultTableModel tableModel;
-	private User user;
+	private JMSUser user;
 	
-	public MainMenuController(MainMenuFrame frame, DefaultTableModel tableModel, User user){
+	public MainMenuController(MainMenuFrame frame, DefaultTableModel tableModel, JMSUser user){
 		this.frame = frame;
 		this.tableModel = tableModel;
 		this.user = user;
@@ -31,13 +31,13 @@ public class MainMenuController {
 	}
 	
 	public void createTopic(String name){
-		Topic topic = new Topic(name, user.name, 1);
+		JMSTopic topic = new JMSTopic(name, user.name, 1);
 
 		//TODO Add topic to JavaSpace...
 		boolean success = true;
 		
 		if(success){
-			Object[] rowData = {topic.getId(), topic.getName(), topic.getOwner(), topic.getUsers()};
+			Object[] rowData = {topic.getName(), topic.getOwner(), topic.getUsers()};
 			tableModel.addRow(rowData);
 		} else {
 			JOptionPane.showMessageDialog(frame, "Failed to create topic.  Topic name already exists");
@@ -45,7 +45,7 @@ public class MainMenuController {
 
 	}
 	
-	public void deleteTopic(Topic topic){
+	public void deleteTopic(JMSTopic topic){
 		if(user.getName().equals(topic.getOwner())){
 			//TODO Remove topic from JavaSpace
 			
@@ -58,7 +58,7 @@ public class MainMenuController {
 		}
 	}
 	
-	public void joinTopic(Topic topic){
+	public void joinTopic(JMSTopic topic){
 		//TODO implement method...
 	}
 	

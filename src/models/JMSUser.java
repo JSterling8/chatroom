@@ -1,15 +1,15 @@
 package models;
 
-public class User {
+public class JMSUser {
 	public String name;
 	public String baseName;
 	public String password;
 	
-	public User(){
+	public JMSUser(){
 		
 	}
 	
-	public User(String name, String baseName, String password) {
+	public JMSUser(String name, String baseName, String password) {
 		this.name = name;
 		this.baseName = baseName;
 		this.password = password;

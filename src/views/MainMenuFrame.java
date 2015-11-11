@@ -16,14 +16,14 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.table.DefaultTableModel;
 
 import controllers.MainMenuController;
-import models.User;
+import models.JMSUser;
 
 public class MainMenuFrame extends JFrame {
 	private static final long serialVersionUID = -1262155724457779827L;
 	
 	private MainMenuController controller;
 
-	public MainMenuFrame(User user) {
+	public MainMenuFrame(JMSUser user) {
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
 		
 		JPanel panel = new JPanel();
