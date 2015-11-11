@@ -3,12 +3,14 @@ package controllers;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang3.StringUtils;
 
 import models.JMSTopic;
 import models.JMSUser;
+import views.LoginFrame;
 import views.MainMenuFrame;
 
 public class MainMenuController {
@@ -79,6 +81,13 @@ public class MainMenuController {
 	}
 
 	public void logout() {
-		// TODO implement method...
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				frame.setVisible(false);
+				frame.dispose();
+
+				new LoginFrame();
+			}
+		});
 	}
 }
