@@ -3,7 +3,10 @@ package controllers;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+import org.apache.commons.lang3.StringUtils;
 
 import models.JMSTopic;
 import models.JMSUser;
@@ -42,9 +45,18 @@ public class ChatroomController {
 	}
 
 	public void handleSubmitPressed(String text) {
-		// TODO Add message to JavaSpace
-		
-		Object[] rowData = {new Date(System.currentTimeMillis()).toString(), user.getName(), text};
-		messagesTableModel.addRow(rowData);
+		if(StringUtils.isNotBlank(text)){
+			// TODO Add message to JavaSpace
+			
+			Object[] rowData = {new Date(System.currentTimeMillis()).toString(), user.getName(), text};
+			messagesTableModel.addRow(rowData);
+			
+			scrollToBottomOfMessages();
+		}
+	}
+
+	private void scrollToBottomOfMessages() {
+		JTable messagesTable = frame.getMessagesTable();
+		messagesTable.scrollRectToVisible(messagesTable.getCellRect(messagesTable.getRowCount() - 1, 0, true));
 	}
 }

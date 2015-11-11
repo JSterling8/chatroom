@@ -25,6 +25,7 @@ public class ChatroomFrame extends JFrame {
 	private DefaultTableModel usersTableModel;
 	private ChatroomController controller;
 	private JTextField tfMessageInput;
+	private JTable messagesTable;
 	
 	public ChatroomFrame(JMSTopic topic, JMSUser user) {
 		this.controller = new ChatroomController(this, topic, user);
@@ -37,7 +38,7 @@ public class ChatroomFrame extends JFrame {
 		
 		messagesTableModel = controller.generateMessagesTableModel();
 
-		JTable messagesTable = new JTable(messagesTableModel);
+		messagesTable = new JTable(messagesTableModel);
 		messagesTable.removeColumn(messagesTable.getColumnModel().getColumn(3));
 		messagesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		// Makes cells non editable.
@@ -79,7 +80,6 @@ public class ChatroomFrame extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				controller.handleSubmitPressed(tfMessageInput.getText());
-				messagesTable.scrollRectToVisible(messagesTable.getCellRect(messagesTable.getRowCount() - 1, 0, true));
 				tfMessageInput.setText(null);
 			}
 		});
@@ -88,6 +88,10 @@ public class ChatroomFrame extends JFrame {
 		
 		setSize(new Dimension(850, 550));
 		setVisible(true);
+	}
+	
+	public JTable getMessagesTable(){
+		return messagesTable;
 	}
 	
     private class SharedListSelectionHandler implements ListSelectionListener {
