@@ -9,5 +9,13 @@
 	<classpathentry kind="lib" path="commons-lang3-3.4.jar"/>
 	<classpathentry kind="lib" path="jgoodies-common-1.8.1-javadoc.jar"/>
 	<classpathentry kind="lib" path="jgoodies-common-1.8.1.jar"/>
+	<classpathentry kind="lib" path="browser-dl.jar"/>
+	<classpathentry kind="lib" path="jini-core.jar"/>
+	<classpathentry kind="lib" path="jini-ext.jar"/>
+	<classpathentry kind="lib" path="outrigger-dl.jar"/>
+	<classpathentry kind="lib" path="outrigger.jar"/>
+	<classpathentry kind="lib" path="reggie-dl.jar"/>
+	<classpathentry kind="lib" path="reggie.jar"/>
+	<classpathentry kind="lib" path="sun-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
