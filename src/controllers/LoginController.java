@@ -7,6 +7,7 @@ import views.LoginFrame;
 import views.MainMenuFrame;
 
 public class LoginController {
+	//FIXME Keep track of all open windows and close app when all are closed.
 	private LoginFrame loginFrame;
 
 	public LoginController(LoginFrame loginFrame) {

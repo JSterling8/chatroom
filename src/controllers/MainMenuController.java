@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import models.JMSTopic;
 import models.JMSUser;
+import views.ChatroomFrame;
 import views.LoginFrame;
 import views.MainMenuFrame;
 
@@ -29,25 +30,19 @@ public class MainMenuController {
 			createTopic(topicName);
 		}
 	}
+	
+	public void handleJoinTopicPressed(UUID topicId) {
+		// TODO Get topic from JavaSpace to verify it exists.
+		JMSTopic topic = new JMSTopic();
+		topic.setId(topicId);
+		topic.setName("TestTopic");
+		topic.setOwner(user);
+		topic.setUsers(2);
 
-	public void createTopic(String name) {
-		JMSTopic topic = new JMSTopic(name, user, 1);
-
-		// TODO Add topic to JavaSpace...
-		boolean success = true;
-
-		if (success) {
-			Object[] rowData = { topic.getName(), topic.getOwner().getName(), topic.getUsers(),
-					topic.getOwner().getId() };
-			tableModel.addRow(rowData);
-		} else {
-			JOptionPane.showMessageDialog(frame, "Failed to create topic.  Topic name already exists");
-		}
-
-		// TODO Open topic window.
+		ChatroomFrame chatroomFrame = new ChatroomFrame(topic, user);
 	}
 
-	public void deleteTopic(int tableModelRow, UUID topicId) {
+	public void handleDeleteTopicPressed(int tableModelRow, UUID topicId) {
 		// TODO Get topic from JavaSpace to verify it exists.
 		JMSTopic topic = new JMSTopic();
 		topic.setId(topicId);
@@ -68,7 +63,8 @@ public class MainMenuController {
 
 	public DefaultTableModel generateTableModelWithTestData() {
 		Object[] columns = { "Topic", "Owner", "User Count", "Owner ID", "Topic ID" };
-		Object[][] data = { { "Topic1", "Owner1", "4", 44, 44 }, { "Topic2", "Owner2", "6", 44, 44 } };
+		Object[][] data = { { "Topic1", "Owner1", "4", UUID.randomUUID(), UUID.randomUUID() }, 
+				{ "Topic2", "Owner2", "6", UUID.randomUUID(), UUID.randomUUID() } };
 		DefaultTableModel tableModel = new DefaultTableModel(data, columns);
 
 		this.tableModel = tableModel;
@@ -89,5 +85,22 @@ public class MainMenuController {
 				new LoginFrame();
 			}
 		});
+	}
+	
+	private void createTopic(String name) {
+		JMSTopic topic = new JMSTopic(name, user, 1);
+
+		// TODO Add topic to JavaSpace...
+		boolean success = true;
+
+		if (success) {
+			Object[] rowData = { topic.getName(), topic.getOwner().getName(), topic.getUsers(),
+					topic.getOwner().getId(), topic.getId() };
+			tableModel.addRow(rowData);
+		} else {
+			JOptionPane.showMessageDialog(frame, "Failed to create topic.  Topic name already exists");
+		}
+
+		joinTopic(topic);
 	}
 }

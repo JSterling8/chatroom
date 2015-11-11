@@ -32,6 +32,7 @@ public class MainMenuFrame extends JFrame {
 	private MainMenuController controller;
 	private DefaultTableModel tableModel;
 	private JButton btnDeleteTopic;
+	private JButton btnJoinTopic;
 	private JMSUser user;
 	
 	public MainMenuFrame(JMSUser user) {
@@ -73,7 +74,20 @@ public class MainMenuFrame extends JFrame {
 			}
 		});
 
-		JButton btnJoinTopic = new JButton("Join Topic");
+		btnJoinTopic = new JButton("Join Topic");
+		btnJoinTopic.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				int selectedRow = table.getSelectedRow();
+				if(selectedRow == -1){
+					//TODO Throw error dialogue saying nothing is selected to join
+				} else {
+					UUID topicIdToJoin = (UUID) tableModel.getValueAt(selectedRow, COLUMN_INDEX_OF_TOPIC_ID);
+					controller.handleJoinTopicPressed(topicIdToJoin);
+				}
+			}
+		});
+		btnJoinTopic.setEnabled(false);
 
 		btnDeleteTopic = new JButton("Delete Topic");
 		btnDeleteTopic.addMouseListener(new MouseAdapter() {
@@ -84,11 +98,11 @@ public class MainMenuFrame extends JFrame {
 					//TODO Throw error dialogue saying nothing is selected to delete
 				} else {
 					UUID topicIdToDelete = (UUID) tableModel.getValueAt(selectedRow, COLUMN_INDEX_OF_TOPIC_ID);
-					controller.deleteTopic(selectedRow, topicIdToDelete);
+					controller.handleDeleteTopicPressed(selectedRow, topicIdToDelete);
 				}
 			}
 		});
-		btnDeleteTopic.setVisible(false);
+		btnDeleteTopic.setEnabled(false);
 		
 		JButton btnLogout = new JButton("Logout");
 		btnLogout.addMouseListener(new MouseAdapter() {
@@ -130,14 +144,16 @@ public class MainMenuFrame extends JFrame {
  
             if (!lsm.isSelectionEmpty()) {
                 int selectedRowIndex = lsm.getMinSelectionIndex();
+                btnJoinTopic.setEnabled(true);
                 
                 if(tableModel.getValueAt(selectedRowIndex, COLUMN_INDEX_OF_TOPIC_OWNER_ID).equals(user.getId())){
-                    btnDeleteTopic.setVisible(true);
+                    btnDeleteTopic.setEnabled(true);
                 } else {
-                	btnDeleteTopic.setVisible(false);
+                	btnDeleteTopic.setEnabled(false);
                 }
             } else {
-            	btnDeleteTopic.setVisible(false);
+            	btnDeleteTopic.setEnabled(false);
+            	btnJoinTopic.setEnabled(false);
             }
 
         }

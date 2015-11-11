@@ -19,8 +19,7 @@ public class JMSTopic {
 		this.owner = owner;
 		this.users = users;
 
-		this.baseName = name.replaceAll("[^A-Za-z0-9]", "");
-		this.baseName = baseName.toUpperCase();
+		setBaseName(name);
 	}
 
 	public UUID getId() {
@@ -37,6 +36,7 @@ public class JMSTopic {
 
 	public void setName(String name) {
 		this.name = name;
+		setBaseName(name);
 	}
 
 	public JMSUser getOwner() {
@@ -59,10 +59,9 @@ public class JMSTopic {
 		return baseName;
 	}
 
-	public void setBaseName(String baseName) {
+	private void setBaseName(String name) {
+		baseName = name;
 		baseName = baseName.replaceAll("[^A-Za-z0-9]", "");
 		baseName = baseName.toUpperCase();
-
-		this.baseName = baseName;
 	}
 }
