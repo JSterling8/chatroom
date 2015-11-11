@@ -17,6 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class LoginFrame extends JFrame {
+	private static final long serialVersionUID = 1479957234936275504L;
 	private LoginController controller;
 
 	public LoginFrame() {
