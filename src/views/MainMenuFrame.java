@@ -1,31 +1,28 @@
 package views;
 
 import javax.swing.JFrame;
-import java.awt.GridBagLayout;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JButton;
-import java.awt.GridBagConstraints;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Insets;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.FormSpecs;
+import controllers.MainMenuController;
+import models.Topic;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JList;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainMenuFrame extends JFrame {
+	private static final long serialVersionUID = -1262155724457779827L;
+	
+	private MainMenuController controller;
+
 	public MainMenuFrame() {
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
 		
@@ -88,6 +85,12 @@ public class MainMenuFrame extends JFrame {
 		
 		
 		JButton btnCreateTopic = new JButton("Create Topic");
+		btnCreateTopic.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				controller.handleCreateButtonPressed();
+			}
+		});
 		
 		JButton btnJoinTopic = new JButton("Join Topic");
 		
@@ -123,6 +126,12 @@ public class MainMenuFrame extends JFrame {
 		
 		setSize(new Dimension(850, 550));
 		setVisible(true);
+		
+		controller = new MainMenuController(tableModel);
+	}
+	
+	public MainMenuController getController(){
+		return controller;
 	}
 	
 	public static void main(String[] args) throws InterruptedException{		
@@ -130,7 +139,7 @@ public class MainMenuFrame extends JFrame {
         {
             public void run()
             {
-                new MainMenuFrame();
+                MainMenuController controller = new MainMenuFrame().getController();           
             }
         });
 	}

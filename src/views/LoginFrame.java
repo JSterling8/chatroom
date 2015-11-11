@@ -11,12 +11,12 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingConstants;
-import javax.swing.JSeparator;
+
+import controllers.LoginController;
 
 public class LoginFrame extends JFrame {
-	private JTextField tfUsername;
-	private JPasswordField passwordField;
+	private LoginController controller;
+	
 	public LoginFrame() {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{35, 48, 129, 46, 0, 0, 0, 0, 0, 126, 0, 0};
@@ -32,7 +32,7 @@ public class LoginFrame extends JFrame {
 		gbc_lblUsername.gridy = 1;
 		getContentPane().add(lblUsername, gbc_lblUsername);
 		
-		tfUsername = new JTextField();
+		JTextField tfUsername = new JTextField();
 		tfUsername.setColumns(15);
 		GridBagConstraints gbc_tfUsername = new GridBagConstraints();
 		gbc_tfUsername.fill = GridBagConstraints.HORIZONTAL;
@@ -52,7 +52,7 @@ public class LoginFrame extends JFrame {
 		gbc_lblPassword.gridy = 2;
 		getContentPane().add(lblPassword, gbc_lblPassword);
 		
-		passwordField = new JPasswordField();
+		JPasswordField passwordField = new JPasswordField();
 		passwordField.setColumns(15);
 		GridBagConstraints gbc_passwordField = new GridBagConstraints();
 		gbc_passwordField.fill = GridBagConstraints.HORIZONTAL;
@@ -82,6 +82,8 @@ public class LoginFrame extends JFrame {
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(588, 202));
+		
+		controller = new LoginController();
 	}
 	
 	public static void main(String[] args) throws InterruptedException{		
