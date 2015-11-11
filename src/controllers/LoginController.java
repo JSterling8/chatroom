@@ -2,6 +2,7 @@ package controllers;
 
 import javax.swing.SwingUtilities;
 
+import models.User;
 import views.LoginFrame;
 import views.MainMenuFrame;
 
@@ -25,7 +26,8 @@ public class LoginController {
 	        {
 	            public void run()
 	            {
-	                new MainMenuFrame();           
+	            	User user = new User("Admin", "admin", "admin");
+	                new MainMenuFrame(user);           
 	            }
 	        });
 		} else {

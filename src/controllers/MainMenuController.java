@@ -7,9 +7,11 @@ import models.User;
 
 public class MainMenuController {
 	private DefaultTableModel tableModel;
+	private User user;
 	
-	public MainMenuController(DefaultTableModel tableModel){
+	public MainMenuController(DefaultTableModel tableModel, User user){
 		this.tableModel = tableModel;
+		this.user = user;
 	}
 	
 	
@@ -25,7 +27,7 @@ public class MainMenuController {
 		tableModel.addRow(rowData);
 	}
 	
-	public void deleteTopic(User user, Topic topic){
+	public void deleteTopic(Topic topic){
 		if(user.getName().equals(topic.getOwner())){
 			//TODO Remove topic from JavaSpace
 			

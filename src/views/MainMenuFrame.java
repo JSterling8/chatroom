@@ -1,29 +1,29 @@
 package views;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.JButton;
 import java.awt.Dimension;
-import controllers.MainMenuController;
-import models.Topic;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.table.DefaultTableModel;
+
+import controllers.MainMenuController;
+import models.User;
 
 public class MainMenuFrame extends JFrame {
 	private static final long serialVersionUID = -1262155724457779827L;
 	
 	private MainMenuController controller;
 
-	public MainMenuFrame() {
+	public MainMenuFrame(User user) {
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
 		
 		JPanel panel = new JPanel();
@@ -127,20 +127,10 @@ public class MainMenuFrame extends JFrame {
 		setSize(new Dimension(850, 550));
 		setVisible(true);
 		
-		controller = new MainMenuController(tableModel);
+		controller = new MainMenuController(tableModel, user);
 	}
 	
 	public MainMenuController getController(){
 		return controller;
-	}
-	
-	public static void main(String[] args) throws InterruptedException{		
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                MainMenuController controller = new MainMenuFrame().getController();           
-            }
-        });
 	}
 }
