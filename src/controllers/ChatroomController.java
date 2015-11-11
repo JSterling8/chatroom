@@ -25,11 +25,10 @@ public class ChatroomController {
 	public DefaultTableModel generateMessagesTableModel() {
 		Object[] columns = { "Date/Time", "User", "Message", "Message ID" };
 		Object[][] data = { { new Date(System.currentTimeMillis()).toString(), "aUser", "This is a test message", UUID.randomUUID()} };
-		DefaultTableModel tableModel = new DefaultTableModel(data, columns);
-
-		this.messagesTableModel = tableModel;
-
-		return tableModel;
+		
+		messagesTableModel = new DefaultTableModel(data, columns);
+		
+		return messagesTableModel;
 	}
 	
 	public DefaultTableModel generateUsersTableModel() {

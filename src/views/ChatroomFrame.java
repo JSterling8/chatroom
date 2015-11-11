@@ -79,6 +79,7 @@ public class ChatroomFrame extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				controller.handleSubmitPressed(tfMessageInput.getText());
+				messagesTable.scrollRectToVisible(messagesTable.getCellRect(messagesTable.getRowCount() - 1, 0, true));
 				tfMessageInput.setText(null);
 			}
 		});
