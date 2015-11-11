@@ -24,7 +24,7 @@ public class LoginController {
 
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					JMSUser user = new JMSUser("Admin", "admin", "admin");
+					JMSUser user = new JMSUser("Admin", "admin");
 					new MainMenuFrame(user);
 				}
 			});

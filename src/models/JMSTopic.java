@@ -6,14 +6,14 @@ public class JMSTopic {
 	public UUID id;
 	public String name;
 	public String baseName;
-	public String owner;
+	public JMSUser owner;
 	public Integer users;
 
 	public JMSTopic() {
 
 	}
 
-	public JMSTopic(String name, String owner, Integer users) {
+	public JMSTopic(String name, JMSUser owner, Integer users) {
 		this.id = UUID.randomUUID();
 		this.name = name;
 		this.owner = owner;
@@ -39,11 +39,11 @@ public class JMSTopic {
 		this.name = name;
 	}
 
-	public String getOwner() {
+	public JMSUser getOwner() {
 		return owner;
 	}
 
-	public void setOwner(String owner) {
+	public void setOwner(JMSUser owner) {
 		this.owner = owner;
 	}
 
