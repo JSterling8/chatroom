@@ -13,6 +13,10 @@ public class JMSTopicUser implements Entry {
 		this.user = user;
 	}
 
+	public JMSTopicUser(JMSTopic topic) {
+		this.topic = topic;
+	}
+
 	public JMSTopic getTopic() {
 		return topic;
 	}

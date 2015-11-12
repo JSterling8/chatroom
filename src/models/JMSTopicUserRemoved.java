@@ -14,6 +14,10 @@ public class JMSTopicUserRemoved implements Entry {
 	
 	public JMSTopicUserRemoved(){}
 
+	public JMSTopicUserRemoved(JMSTopicUser topicUser){
+		this.topicUser = topicUser;
+	}
+	
 	public JMSTopicUser getTopicUser() {
 		return topicUser;
 	}

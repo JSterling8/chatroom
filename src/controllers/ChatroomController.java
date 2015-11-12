@@ -13,8 +13,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import models.JMSMessage;
 import models.JMSTopic;
+import models.JMSTopicUser;
 import models.JMSUser;
 import services.MessageService;
+import services.TopicService;
 import views.ChatroomFrame;
 
 public class ChatroomController {
@@ -23,6 +25,7 @@ public class ChatroomController {
 	private DefaultTableModel messagesTableModel;
 	private DefaultTableModel usersTableModel;
 	private MessageService messageService;
+	private TopicService topicService;
 	private JMSTopic topic;
 	private JMSUser user;
 	
@@ -30,8 +33,9 @@ public class ChatroomController {
 		this.frame = frame;
 		this.topic = topic;
 		this.user = user;
-		
+				
 		this.messageService = MessageService.getMessageService();
+		this.topicService = TopicService.getTopicService();
 		
 		markUserAsInTopic();
 	}
@@ -59,12 +63,21 @@ public class ChatroomController {
 	
 	public DefaultTableModel generateUsersTableModel() {
 		Object[] columns = { "Users", "User ID" };
-		Object[][] data = { { "aUser", UUID.randomUUID()} };
-		DefaultTableModel tableModel = new DefaultTableModel(data, columns);
+		List<JMSTopicUser> users = topicService.getAllTopicUsers(topic);
 
-		this.usersTableModel = tableModel;
+		Object[][] data = {};
+		
+		if(users != null && users.size() > 0){
+			data = new Object[users.size()][2];
+			for(int i = 0; i < users.size(); i++){
+				data[i][0] = users.get(i).getUser().getName();
+				data[i][1] = users.get(i).getUser().getId();
+			}
+		}
+		
+		usersTableModel = new DefaultTableModel(data, columns);
 
-		return tableModel;
+		return usersTableModel;
 	}
 
 	public void handleSubmitPressed() {
@@ -99,7 +112,7 @@ public class ChatroomController {
 	}
 
 	public void markUserAsInTopic() {
-		//TODO Implement method.
+		topicService.addTopicUser(topic, user);
 	}
 
 	public void handleWindowClose() {
