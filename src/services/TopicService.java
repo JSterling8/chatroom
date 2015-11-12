@@ -33,32 +33,32 @@ public class TopicService {
 		return topicService;
 	}
 
-	public void createTopic(JMSTopic topic) {
+	public void createTopic(JMSTopic topic) throws Exception {
 		Transaction transaction = null;
 
 		try {
-			TransactionManager transactionManager = SpaceService.getManager();
+			/*TransactionManager transactionManager = SpaceService.getManager();
 			Created transactionCreated = TransactionFactory.create(transactionManager, 1000 * 10);
-			transaction = transactionCreated.transaction;
+			transaction = transactionCreated.transaction;*/
 			if (isValidTopic(topic) && !topicExistsInSpace(topic, transaction)) {
 				space.write(topic, transaction, Lease.FOREVER);
-				transaction.commit();
+				/*transaction.commit();*/
 			} else {
 				// TODO Throw new invalid topic exception (i.e., id or something
 				// is missing). Or already exists.
 			}
 
 		} catch (Exception e) {
-			if (transaction != null) {
+/*			if (transaction != null) {
 				try {
 					transaction.abort();
 				} catch (Exception e1) {
 					System.err.println("Failed to abort transaction");
 					e1.printStackTrace();
 				}
-			}
+			}*/
 
-			e.printStackTrace();
+			throw e;
 		}
 	}
 
@@ -67,26 +67,30 @@ public class TopicService {
 		List<JMSTopic> topics = new ArrayList<JMSTopic>();
 
 		try {
-			TransactionManager transactionManager = SpaceService.getManager();
+/*			TransactionManager transactionManager = SpaceService.getManager();
 			Created transactionCreated = TransactionFactory.create(transactionManager, 1000 * 10);
-			transaction = transactionCreated.transaction;
+			transaction = transactionCreated.transaction;*/
 
 			JMSTopic template = new JMSTopic();
 			while (space.readIfExists(template, transaction, 1000) != null) {
 				topics.add((JMSTopic) space.takeIfExists(template, transaction, 1000));
 			}
+			
+			for(JMSTopic topic : topics){
+				space.write(topic, null, Lease.FOREVER);
+			}
 
-			transaction.abort();
+			/*transaction.abort();*/
 
 		} catch (Exception e) {
-			if (transaction != null) {
+/*			if (transaction != null) {
 				try {
 					transaction.abort();
 				} catch (Exception e1) {
 					System.err.println("Failed to abort transaction");
 					e1.printStackTrace();
 				}
-			}
+			}*/
 
 			e.printStackTrace();
 		}

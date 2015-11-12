@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
@@ -10,11 +11,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import models.JMSTopic;
 import models.JMSUser;
+import services.TopicService;
 import views.ChatroomFrame;
 import views.LoginFrame;
 import views.MainMenuFrame;
 
 public class MainMenuController {
+	private static TopicService topicService = TopicService.getTopicService();
+	
 	private MainMenuFrame frame;
 	private DefaultTableModel tableModel;
 	private JMSUser user;
@@ -43,17 +47,10 @@ public class MainMenuController {
 	}
 
 	public void handleDeleteTopicPressed(int tableModelRow, UUID topicId) {
-		// TODO Get topic from JavaSpace to verify it exists.
-		JMSTopic topic = new JMSTopic();
-		topic.setId(topicId);
-		// FIXME - This currently bypasses the authentication in the if check
-		// below. MUST get Topic from JavaSpace with a template that has the
-		// topicId
-		topic.setOwner(user);
-		topic.setName(user.getName());
+		JMSTopic topic = topicService.getTopicById(topicId);
 
 		if (user.equals(topic.getOwner())) {
-			// TODO Remove topic from JavaSpace
+			topicService.deleteTopic(topic);
 
 			tableModel.removeRow(tableModelRow);
 		} else {
@@ -61,10 +58,23 @@ public class MainMenuController {
 		}
 	}
 
-	public DefaultTableModel generateTableModelWithTestData() {
+	public DefaultTableModel generateTopicTableModel() {
 		Object[] columns = { "Topic", "Owner", "User Count", "Owner ID", "Topic ID" };
-		Object[][] data = { { "Topic1", "Owner1", "4", UUID.randomUUID(), UUID.randomUUID() }, 
-				{ "Topic2", "Owner2", "6", UUID.randomUUID(), UUID.randomUUID() } };
+		List<JMSTopic> topics = topicService.getAllTopics();
+		
+		Object[][] data = {};
+		
+		if(topics != null && topics.size() > 0){
+			data = new Object[topics.size()][5];
+			for(int i = 0; i < topics.size(); i++){
+				data[i][0] = topics.get(i).getName();
+				data[i][1] = topics.get(i).getOwner().getName();
+				data[i][2] = topics.get(i).getUsers();
+				data[i][3] = topics.get(i).getOwner().getId();
+				data[i][4] = topics.get(i).getId();
+			}
+		}
+
 		DefaultTableModel tableModel = new DefaultTableModel(data, columns);
 
 		this.tableModel = tableModel;
@@ -89,10 +99,14 @@ public class MainMenuController {
 	
 	private void createTopic(String name) {
 		JMSTopic topic = new JMSTopic(name, user, 1);
-
-		// TODO Add topic to JavaSpace...
 		boolean success = true;
 
+		try{
+			topicService.createTopic(topic);
+		} catch (Exception e){
+			success = false;
+		}
+		
 		if (success) {
 			Object[] rowData = { topic.getName(), topic.getOwner().getName(), topic.getUsers(),
 					topic.getOwner().getId(), topic.getId() };

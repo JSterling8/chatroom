@@ -18,5 +18,7 @@
 	<classpathentry kind="lib" path="libraries/reggie-dl.jar"/>
 	<classpathentry kind="lib" path="libraries/reggie.jar"/>
 	<classpathentry kind="lib" path="libraries/sun-util.jar"/>
+	<classpathentry kind="lib" path="libraries/mahalo-dl.jar"/>
+	<classpathentry kind="lib" path="libraries/mahalo.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

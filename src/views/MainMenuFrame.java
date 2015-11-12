@@ -46,7 +46,7 @@ public class MainMenuFrame extends JFrame {
 		getContentPane().add(panel);
 		panel.setLayout(null);
 
-		tableModel = controller.generateTableModelWithTestData();
+		tableModel = controller.generateTopicTableModel();
 
 		JTable table = new JTable(tableModel);
 		table.removeColumn(table.getColumnModel().getColumn(COLUMN_INDEX_OF_TOPIC_OWNER_ID));

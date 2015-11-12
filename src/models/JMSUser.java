@@ -59,7 +59,7 @@ public class JMSUser implements Entry {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof JMSUser) {
+		if (o != null && o instanceof JMSUser) {
 			JMSUser otherUser = (JMSUser) o;
 			
 			if (otherUser.getBaseName().equals(this.getBaseName())
