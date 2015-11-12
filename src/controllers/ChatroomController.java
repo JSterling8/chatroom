@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,7 @@ import models.JMSUser;
 import views.ChatroomFrame;
 
 public class ChatroomController {
+	//TODO Spam prevention
 	private ChatroomFrame frame;
 	private DefaultTableModel messagesTableModel;
 	private DefaultTableModel usersTableModel;
@@ -44,7 +46,10 @@ public class ChatroomController {
 		return tableModel;
 	}
 
-	public void handleSubmitPressed(String text) {
+	public void handleSubmitPressed() {
+		JTextField tfMessageInput = frame.getTfMessageInput();
+		String text = tfMessageInput.getText();
+		
 		if(StringUtils.isNotBlank(text)){
 			// TODO Add message to JavaSpace
 			
@@ -52,6 +57,7 @@ public class ChatroomController {
 			messagesTableModel.addRow(rowData);
 			
 			scrollToBottomOfMessages();
+			tfMessageInput.setText(null);
 		}
 	}
 

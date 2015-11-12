@@ -23,6 +23,7 @@ import controllers.MainMenuController;
 import models.JMSUser;
 
 public class MainMenuFrame extends JFrame {
+	//TODO Pressing enter should join the selected chat.
 	private static final int COLUMN_INDEX_OF_TOPIC_ID = 4;
 
 	private static final int COLUMN_INDEX_OF_TOPIC_OWNER_ID = 3;

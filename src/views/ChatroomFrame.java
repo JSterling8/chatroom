@@ -2,6 +2,8 @@ package views;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -71,6 +73,14 @@ public class ChatroomFrame extends JFrame {
 		panel.add(spUsers);
 		
 		tfMessageInput = new JTextField();
+		tfMessageInput.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				if(arg0.getKeyCode() == KeyEvent.VK_ENTER){
+					controller.handleSubmitPressed();
+				}
+			}
+		});
 		tfMessageInput.setBounds(10, 461, 692, 31);
 		panel.add(tfMessageInput);
 		tfMessageInput.setColumns(10);
@@ -79,8 +89,7 @@ public class ChatroomFrame extends JFrame {
 		btnSubmit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				controller.handleSubmitPressed(tfMessageInput.getText());
-				tfMessageInput.setText(null);
+				controller.handleSubmitPressed();
 			}
 		});
 		btnSubmit.setBounds(712, 461, 110, 31);
@@ -92,6 +101,10 @@ public class ChatroomFrame extends JFrame {
 	
 	public JTable getMessagesTable(){
 		return messagesTable;
+	}
+	
+	public JTextField getTfMessageInput() {
+		return tfMessageInput;
 	}
 	
     private class SharedListSelectionHandler implements ListSelectionListener {
