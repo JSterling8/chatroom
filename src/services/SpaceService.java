@@ -9,7 +9,8 @@ import net.jini.core.lookup.ServiceTemplate;
 import net.jini.core.lookup.ServiceMatches;
 
 /**
- * This is Dr. Gary Allen's SpaceUtils class, which I've renamed and made a few tweaks to. 
+ * This is Dr. Gary Allen's SpaceUtils class, which I've renamed and made a few
+ * tweaks to.
  * 
  * @author Gary Allen
  *
@@ -23,7 +24,7 @@ public class SpaceService {
 			ServiceRegistrar sr = l.getRegistrar();
 
 			Class c = Class.forName("net.jini.space.JavaSpace");
-			Class[] classTemplate = {c};
+			Class[] classTemplate = { c };
 
 			js = (JavaSpace) sr.lookup(new ServiceTemplate(null, classTemplate, null));
 
@@ -34,9 +35,8 @@ public class SpaceService {
 	}
 
 	public static JavaSpace getSpace() {
-		return getSpace("waterloo");
+		return getSpace("127.0.0.1");
 	}
-
 
 	public static TransactionManager getManager(String hostname) {
 		if (System.getSecurityManager() == null) {
@@ -50,7 +50,7 @@ public class SpaceService {
 			ServiceRegistrar sr = l.getRegistrar();
 
 			Class c = Class.forName("net.jini.core.transaction.server.TransactionManager");
-			Class[] classTemplate = {c};
+			Class[] classTemplate = { c };
 
 			tm = (TransactionManager) sr.lookup(new ServiceTemplate(null, classTemplate, null));
 
@@ -58,5 +58,9 @@ public class SpaceService {
 			System.err.println("Error: " + e);
 		}
 		return tm;
+	}
+
+	public static TransactionManager getManager() {
+		return getManager("127.0.0.1");
 	}
 }
