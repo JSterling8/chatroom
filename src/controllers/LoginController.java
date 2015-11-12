@@ -15,7 +15,7 @@ public class LoginController {
 	}
 
 	public void handleLoginButtonPressed(String username, String password) {
-		// TODO Encrypt password and check against list of users in JavaSpace
+		// TODO Encrypt password and check against user in JavaSpace (if one exists)
 
 		boolean success = true;
 
@@ -35,6 +35,7 @@ public class LoginController {
 	}
 
 	public void handleCreateButtonPressed(String username, String password) {
+		// TODO Popup with a "Confirm Password" text box
 		// TODO Encrypt password, create User, put in JavaSpace
 		boolean success = true;
 
