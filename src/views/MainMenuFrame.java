@@ -131,6 +131,7 @@ public class MainMenuFrame extends JFrame {
 						.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnLogout).addContainerGap()));
 		panel_1.setLayout(gl_panel_1);
 
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(850, 550));
 		setVisible(true);
 	}

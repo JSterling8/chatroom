@@ -103,6 +103,7 @@ public class LoginFrame extends JFrame {
 		});
 		panel_1.add(btnLogin);
 		
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(450, 200));
 		setVisible(true);
 	}

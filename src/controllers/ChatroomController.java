@@ -101,4 +101,9 @@ public class ChatroomController {
 	public void markUserAsInTopic() {
 		//TODO Implement method.
 	}
+
+	public void handleWindowClose() {
+		// TODO Remove user from topic
+		
+	}
 }

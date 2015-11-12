@@ -95,6 +95,7 @@ public class ChatroomFrame extends JFrame {
 		btnSubmit.setBounds(712, 461, 110, 31);
 		panel.add(btnSubmit);
 		
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(new Dimension(850, 550));
 		setVisible(true);		
 	}
@@ -124,5 +125,12 @@ public class ChatroomFrame extends JFrame {
             }*/
 
         }
+    }
+    
+    @Override
+    public void dispose(){
+    	super.dispose();
+    	
+    	controller.handleWindowClose();
     }
 }
