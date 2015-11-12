@@ -2,7 +2,9 @@ package models;
 
 import java.util.UUID;
 
-public class JMSUser {
+import net.jini.core.entry.Entry;
+
+public class JMSUser implements Entry {
 	public String name;
 	public String baseName;
 	public String password;
@@ -17,8 +19,7 @@ public class JMSUser {
 		this.password = password;
 		this.id = UUID.randomUUID();
 		
-		this.baseName = name.replaceAll("[^A-Za-z0-9]", "");
-		this.baseName = baseName.toUpperCase();
+		setBaseName(name);
 	}
 
 	public String getName() {
@@ -27,14 +28,17 @@ public class JMSUser {
 
 	public void setName(String name) {
 		this.name = name;
+		setBaseName(name);
 	}
 
 	public String getBaseName() {
 		return baseName;
 	}
 
-	public void setBaseName(String baseName) {
-		this.baseName = baseName;
+	public void setBaseName(String name) {
+		baseName = name;
+		baseName = baseName.replaceAll("[^A-Za-z0-9]", "");
+		baseName = baseName.toUpperCase();
 	}
 
 	public String getPassword() {

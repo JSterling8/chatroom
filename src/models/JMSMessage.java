@@ -1,5 +1,7 @@
 package models;
 
-public class JMSMessage {
+import net.jini.core.entry.Entry;
+
+public class JMSMessage implements Entry {
 
 }

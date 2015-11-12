@@ -2,7 +2,9 @@ package models;
 
 import java.util.UUID;
 
-public class JMSTopic {
+import net.jini.core.entry.Entry;
+
+public class JMSTopic implements Entry {
 	public UUID id;
 	public String name;
 	public String baseName;
@@ -47,7 +49,7 @@ public class JMSTopic {
 		this.owner = owner;
 	}
 
-	public int getUsers() {
+	public Integer getUsers() {
 		return users;
 	}
 
@@ -59,7 +61,7 @@ public class JMSTopic {
 		return baseName;
 	}
 
-	private void setBaseName(String name) {
+	public void setBaseName(String name) {
 		baseName = name;
 		baseName = baseName.replaceAll("[^A-Za-z0-9]", "");
 		baseName = baseName.toUpperCase();

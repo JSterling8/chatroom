@@ -1,12 +1,10 @@
 package services;
 
-import net.jini.space.JavaSpace;
-import net.jini.core.transaction.server.TransactionManager;
-import java.rmi.RMISecurityManager;
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.core.lookup.ServiceTemplate;
-import net.jini.core.lookup.ServiceMatches;
+import net.jini.core.transaction.server.TransactionManager;
+import net.jini.space.JavaSpace;
 
 /**
  * This is Dr. Gary Allen's SpaceUtils class, which I've renamed and made a few
@@ -40,7 +38,7 @@ public class SpaceService {
 
 	public static TransactionManager getManager(String hostname) {
 		if (System.getSecurityManager() == null) {
-			System.setSecurityManager(new RMISecurityManager());
+			System.setSecurityManager(new SecurityManager());
 		}
 
 		TransactionManager tm = null;
