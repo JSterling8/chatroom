@@ -60,9 +60,8 @@ public class TopicService {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<JMSTopic> getAllTopics() {
-		return lookupHelper.findAllOfType(space, new JMSTopic());
+		return lookupHelper.findAllMatchingTemplate(space, new JMSTopic());
 	}
 
 	public JMSTopic getTopicByName(String name) {
@@ -88,7 +87,7 @@ public class TopicService {
 		try {
 			topic = (JMSTopic) space.readIfExists(template, null, 1000);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			// TODO Finer error handling
 			e.printStackTrace();
 		}
 

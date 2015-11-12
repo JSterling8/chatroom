@@ -37,11 +37,7 @@ public class MainMenuController {
 	
 	public void handleJoinTopicPressed(UUID topicId) {
 		// TODO Get topic from JavaSpace to verify it exists.
-		JMSTopic topic = new JMSTopic();
-		topic.setId(topicId);
-		topic.setName("TestTopic");
-		topic.setOwner(user);
-		topic.setUsers(2);
+		JMSTopic topic = topicService.getTopicById(topicId);
 
 		ChatroomFrame chatroomFrame = new ChatroomFrame(topic, user);
 	}
@@ -82,10 +78,6 @@ public class MainMenuController {
 		return tableModel;
 	}
 
-	public void joinTopic(JMSTopic topic) {
-		// TODO implement method...
-	}
-
 	public void logout() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -114,7 +106,5 @@ public class MainMenuController {
 		} else {
 			JOptionPane.showMessageDialog(frame, "Failed to create topic.  Topic name already exists");
 		}
-
-		joinTopic(topic);
 	}
 }

@@ -96,7 +96,7 @@ public class ChatroomFrame extends JFrame {
 		panel.add(btnSubmit);
 		
 		setSize(new Dimension(850, 550));
-		setVisible(true);
+		setVisible(true);		
 	}
 	
 	public JTable getMessagesTable(){

@@ -70,5 +70,4 @@ public class JMSUser implements Entry {
 
 		return false;
 	}
-
 }

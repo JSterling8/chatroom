@@ -15,7 +15,7 @@ public class EntryLookupHelper {
 	public EntryLookupHelper() {}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Entry> List<T> findAllOfType(JavaSpace space, T template) {		
+	public <T extends Entry> List<T> findAllMatchingTemplate(JavaSpace space, T template) {		
 		Transaction transaction = null;
 		List<T> entries = new ArrayList<T>();
 
