@@ -1,20 +1,15 @@
 package services;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
+import exceptions.DuplicateEntryException;
 import models.JMSTopic;
-import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
-import net.jini.core.transaction.Transaction.Created;
-import net.jini.core.transaction.TransactionException;
-import net.jini.core.transaction.TransactionFactory;
-import net.jini.core.transaction.server.TransactionManager;
 import net.jini.space.JavaSpace;
 
 public class TopicService {
@@ -46,6 +41,7 @@ public class TopicService {
 			} else {
 				// TODO Throw new invalid topic exception (i.e., id or something
 				// is missing). Or already exists.
+				throw new DuplicateEntryException();
 			}
 
 		} catch (Exception e) {
@@ -139,7 +135,7 @@ public class TopicService {
 	private boolean topicExistsInSpace(JMSTopic topic, Transaction transaction) {
 		try {
 			JMSTopic template = new JMSTopic();
-			template.setName(topic.getName());
+			template.setBaseName(topic.getBaseName());
 			JMSTopic topicBaseNameMatch = (JMSTopic) space.readIfExists(template, transaction, 2000);
 
 			template = new JMSTopic();

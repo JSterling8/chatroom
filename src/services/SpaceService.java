@@ -1,16 +1,9 @@
 package services;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.rmi.RMISecurityManager;
-import java.rmi.RemoteException;
-
 import net.jini.core.discovery.LookupLocator;
-import net.jini.core.entry.Entry;
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.core.lookup.ServiceTemplate;
 import net.jini.core.transaction.server.TransactionManager;
-import net.jini.lookup.entry.Name;
 import net.jini.space.JavaSpace;
 
 /**
@@ -40,7 +33,7 @@ public class SpaceService {
 	}
 
 	public static JavaSpace getSpace() {
-		return getSpace("127.0.0.1");
+		return getSpace("localhost");
 	}
 
 	public static TransactionManager getManager(String hostname) {
@@ -55,7 +48,7 @@ public class SpaceService {
 			ServiceRegistrar sr = l.getRegistrar();
 
 			Class c = Class.forName("net.jini.core.transaction.server.TransactionManager");
-			Class[] classTemplate = {c};
+			Class[] classTemplate = { c };
 
 			tm = (TransactionManager) sr.lookup(new ServiceTemplate(null, classTemplate, null));
 
@@ -66,6 +59,6 @@ public class SpaceService {
 	}
 
 	public static TransactionManager getManager() {
-		return getManager("127.0.0.1");
+		return getManager("localhost");
 	}
 }
