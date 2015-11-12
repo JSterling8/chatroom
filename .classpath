@@ -3,19 +3,20 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="jgoodies-forms-1.8.0.jar" sourcepath="jgoodies-forms-1.8.0-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="commons-lang3-3.4-javadoc.jar"/>
-	<classpathentry kind="lib" path="commons-lang3-3.4.jar"/>
-	<classpathentry kind="lib" path="jgoodies-common-1.8.1-javadoc.jar"/>
-	<classpathentry kind="lib" path="jgoodies-common-1.8.1.jar"/>
-	<classpathentry kind="lib" path="browser-dl.jar"/>
-	<classpathentry kind="lib" path="jini-core.jar"/>
-	<classpathentry kind="lib" path="jini-ext.jar"/>
-	<classpathentry kind="lib" path="outrigger-dl.jar"/>
-	<classpathentry kind="lib" path="outrigger.jar"/>
-	<classpathentry kind="lib" path="reggie-dl.jar"/>
-	<classpathentry kind="lib" path="reggie.jar"/>
-	<classpathentry kind="lib" path="sun-util.jar"/>
+	<classpathentry kind="lib" path="libraries/browser-dl.jar"/>
+	<classpathentry kind="lib" path="libraries/commons-lang3-3.4-javadoc.jar"/>
+	<classpathentry kind="lib" path="libraries/commons-lang3-3.4.jar"/>
+	<classpathentry kind="lib" path="libraries/jgoodies-common-1.8.1-javadoc.jar"/>
+	<classpathentry kind="lib" path="libraries/jgoodies-common-1.8.1.jar"/>
+	<classpathentry kind="lib" path="libraries/jgoodies-forms-1.8.0-sources.jar"/>
+	<classpathentry kind="lib" path="libraries/jgoodies-forms-1.8.0.jar"/>
+	<classpathentry kind="lib" path="libraries/jini-core.jar"/>
+	<classpathentry kind="lib" path="libraries/jini-ext.jar"/>
+	<classpathentry kind="lib" path="libraries/outrigger-dl.jar"/>
+	<classpathentry kind="lib" path="libraries/outrigger.jar"/>
+	<classpathentry kind="lib" path="libraries/reggie-dl.jar"/>
+	<classpathentry kind="lib" path="libraries/reggie.jar"/>
+	<classpathentry kind="lib" path="libraries/sun-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
