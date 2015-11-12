@@ -104,6 +104,7 @@ public class TopicService {
 			space.takeIfExists(topic, null, 3000);
 			
 			deleteAllTopicUsers(topic);
+			MessageService.getMessageService().deleteAllTopicMessages(topic);
 		} catch (Exception e){
 			e.printStackTrace();
 		}

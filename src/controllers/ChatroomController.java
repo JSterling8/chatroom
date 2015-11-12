@@ -87,7 +87,7 @@ public class ChatroomController {
 		if(StringUtils.isNotBlank(text)){
 			boolean successfullyAddedToSpace = false;
 			try {
-				messageService.createMessage(new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), text));
+				messageService.createPublicMessage(new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), text));
 				successfullyAddedToSpace = true;
 			} catch (Exception e) {
 				// TODO Finer error catching.
@@ -101,7 +101,7 @@ public class ChatroomController {
 				scrollToBottomOfMessages();
 				tfMessageInput.setText(null);
 			} else {
-				JOptionPane.showMessageDialog(frame, "Failed to send message to server.");
+				JOptionPane.showMessageDialog(frame, "Failed to send message to server.  Perhaps the owner has deleted the topic?");
 			}
 		}
 	}
