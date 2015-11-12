@@ -24,6 +24,8 @@ import models.JMSUser;
 
 public class MainMenuFrame extends JFrame {
 	//TODO Pressing enter should join the selected chat.
+	//TODO Double clicking should join the selected chat.
+	//TODO Refresh the table model every x seconds (or put a refresh button?)
 	private static final int COLUMN_INDEX_OF_TOPIC_ID = 4;
 
 	private static final int COLUMN_INDEX_OF_TOPIC_OWNER_ID = 3;
