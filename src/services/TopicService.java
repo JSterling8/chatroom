@@ -1,6 +1,5 @@
 package services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,15 +7,18 @@ import org.apache.commons.lang3.StringUtils;
 
 import exceptions.DuplicateEntryException;
 import models.JMSTopic;
+import net.jini.core.entry.Entry;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
 import net.jini.space.JavaSpace;
+import services.helper.EntryLookupHelper;
 
 public class TopicService {
 	private static TopicService topicService;
 
 	private JavaSpace space = SpaceService.getSpace();
-
+	private EntryLookupHelper lookupHelper = new EntryLookupHelper();
+	
 	private TopicService() {
 	}
 
@@ -58,40 +60,9 @@ public class TopicService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<JMSTopic> getAllTopics() {
-		Transaction transaction = null;
-		List<JMSTopic> topics = new ArrayList<JMSTopic>();
-
-		try {
-/*			TransactionManager transactionManager = SpaceService.getManager();
-			Created transactionCreated = TransactionFactory.create(transactionManager, 1000 * 10);
-			transaction = transactionCreated.transaction;*/
-
-			JMSTopic template = new JMSTopic();
-			while (space.readIfExists(template, transaction, 1000) != null) {
-				topics.add((JMSTopic) space.takeIfExists(template, transaction, 1000));
-			}
-			
-			for(JMSTopic topic : topics){
-				space.write(topic, null, Lease.FOREVER);
-			}
-
-			/*transaction.abort();*/
-
-		} catch (Exception e) {
-/*			if (transaction != null) {
-				try {
-					transaction.abort();
-				} catch (Exception e1) {
-					System.err.println("Failed to abort transaction");
-					e1.printStackTrace();
-				}
-			}*/
-
-			e.printStackTrace();
-		}
-
-		return topics;
+		return lookupHelper.findAllOfType(space, new JMSTopic());
 	}
 
 	public JMSTopic getTopicByName(String name) {
