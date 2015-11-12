@@ -28,7 +28,7 @@ public class EntryLookupHelper {
 				entries.add((T) space.takeIfExists(template, transaction, 1000));
 			}
 			
-			for(Entry entry : entries) {
+			for(T entry : entries) {
 				space.write(entry, null, Lease.FOREVER);
 			}
 
