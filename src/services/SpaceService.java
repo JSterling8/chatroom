@@ -48,35 +48,19 @@ public class SpaceService {
 			System.setSecurityManager(new SecurityManager());
 		}
 
-		// Creating service template to find transaction manager service by
-		// matching fields.
-		Class[] classes = new Class[] { net.jini.core.transaction.server.TransactionManager.class };
-		Name sn = new Name("*");
-		ServiceTemplate tmpl = new ServiceTemplate(null, classes, new Entry[] {});
-
-		// Creating a lookup locator.
-		LookupLocator locator = null;
-		try {
-			locator = new LookupLocator("jini://" + hostname);
-		} catch (MalformedURLException ex) {
-			System.out.println(ex.getMessage());
-			ex.printStackTrace();
-		}
-
-		ServiceRegistrar sr = null;
-		try {
-			sr = locator.getRegistrar();
-		} catch (ClassNotFoundException ex1) {
-			ex1.printStackTrace();
-		} catch (IOException ex1) {
-			ex1.printStackTrace();
-		}
-
 		TransactionManager tm = null;
 		try {
-			tm = (TransactionManager) sr.lookup(tmpl);
-		} catch (RemoteException ex2) {
-			ex2.printStackTrace();
+			LookupLocator l = new LookupLocator("jini://" + hostname);
+
+			ServiceRegistrar sr = l.getRegistrar();
+
+			Class c = Class.forName("net.jini.core.transaction.server.TransactionManager");
+			Class[] classTemplate = {c};
+
+			tm = (TransactionManager) sr.lookup(new ServiceTemplate(null, classTemplate, null));
+
+		} catch (Exception e) {
+			System.err.println("Error: " + e);
 		}
 		return tm;
 	}
