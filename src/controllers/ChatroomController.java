@@ -91,7 +91,8 @@ public class ChatroomController {
 				successfullyAddedToSpace = true;
 			} catch (Exception e) {
 				// TODO Finer error catching.
-				e.printStackTrace();
+				// No real need to print stack trace at the moment.  This could happen for legitimate reasons.
+				// TODO Topic deleted notification?
 			}
 			
 			if(successfullyAddedToSpace){
