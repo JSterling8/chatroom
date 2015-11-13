@@ -23,6 +23,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import controllers.LoginController;
 
 public class LoginFrame extends JFrame {
+	//TODO Add new textbox to enter hostname
 	private static final long serialVersionUID = 1479957234936275504L;
 	private LoginController controller;
 
