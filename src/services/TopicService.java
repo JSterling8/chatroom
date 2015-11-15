@@ -48,7 +48,7 @@ public class TopicService {
 			} else {
 				// TODO Throw new invalid topic exception (i.e., id or something
 				// is missing). Or already exists.
-				throw new DuplicateEntryException();
+				throw new DuplicateEntryException("Failed to create topic.  Topic baseName or id matches with an existing topic.");
 			}
 
 		} catch (Exception e) {

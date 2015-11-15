@@ -21,6 +21,8 @@ import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
 
 import controllers.LoginController;
+import java.awt.Color;
+import java.awt.Font;
 
 public class LoginFrame extends JFrame {
 	//TODO Add new textbox to enter hostname
@@ -90,7 +92,7 @@ public class LoginFrame extends JFrame {
 		btnCreate.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				controller.handleCreateButtonPressed(tfUsername.getText(), pfPassword.getPassword().toString());
+				controller.handleCreateButtonPressed(tfUsername.getText(), new String(pfPassword.getPassword()));
 			}
 		});
 		panel_1.add(btnCreate);
@@ -99,10 +101,15 @@ public class LoginFrame extends JFrame {
 		btnLogin.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				controller.handleLoginButtonPressed(tfUsername.getText(), pfPassword.getPassword().toString());
+				controller.handleLoginButtonPressed(tfUsername.getText(), new String(pfPassword.getPassword()));
 			}
 		});
 		panel_1.add(btnLogin);
+		
+		JLabel lblPleaseNoteThat = new JLabel("Please note that accounts are deleted if not logged into after 30 days");
+		lblPleaseNoteThat.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblPleaseNoteThat.setForeground(Color.RED);
+		panel.add(lblPleaseNoteThat);
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(450, 200));

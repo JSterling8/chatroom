@@ -3,6 +3,7 @@ package models;
 import java.util.UUID;
 
 import net.jini.core.entry.Entry;
+import net.jini.core.lease.Lease;
 
 public class JMSUser implements Entry {
 	public String name;
