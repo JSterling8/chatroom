@@ -170,9 +170,15 @@ public class TopicService {
 				removed = true;
 			}
 			
-			if(removed){
-				// This is so a later notification can pick this up and remove the user from an open topic user list.
-				space.write(new JMSTopicUserRemoved(template), null, 1000);
+			
+			if(removed) {
+				JMSTopicUserRemoved removedObject = new JMSTopicUserRemoved(template);
+				
+				if(space.readIfExists(removedObject, null, 1000) == null){
+					// This is so a later notification can pick this up and remove the user from an open topic user list.
+					space.write(new JMSTopicUserRemoved(template), null, 1000);
+				}
+
 			}
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
 			// TODO Better error handling?

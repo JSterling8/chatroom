@@ -118,6 +118,6 @@ public class ChatroomController {
 
 	public void handleWindowClose() {
 		// TODO Remove user from topic
-		
+		topicService.removeTopicUser(topic, user);
 	}
 }
