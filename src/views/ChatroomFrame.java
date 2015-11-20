@@ -49,7 +49,7 @@ public class ChatroomFrame extends JFrame {
 			Class<?> columnClass = messagesTable.getColumnClass(i);
 			messagesTable.setDefaultEditor(columnClass, null);
 		}
-		messagesTable.getSelectionModel().addListSelectionListener(new SharedListSelectionHandler());
+		messagesTable.getSelectionModel().addListSelectionListener(new SharedMessageListSelectionHandler());
 
 		JScrollPane spMessages = new JScrollPane(messagesTable);
 		spMessages.setBounds(10, 0, 620, 450);
@@ -67,7 +67,7 @@ public class ChatroomFrame extends JFrame {
 			Class<?> columnClass = usersTable.getColumnClass(i);
 			usersTable.setDefaultEditor(columnClass, null);
 		}
-		usersTable.getSelectionModel().addListSelectionListener(new SharedListSelectionHandler());
+		usersTable.getSelectionModel().addListSelectionListener(new SharedUserListSelectionHandler());
 		
 		JScrollPane spUsers = new JScrollPane(usersTable);
 		spUsers.setBounds(640, 0, 182, 450);
@@ -109,29 +109,37 @@ public class ChatroomFrame extends JFrame {
 		return tfMessageInput;
 	}
 	
-    private class SharedListSelectionHandler implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent e) { 
-            ListSelectionModel lsm = (ListSelectionModel)e.getSource();
- 
-/*            if (!lsm.isSelectionEmpty()) {
-                int selectedRowIndex = lsm.getMinSelectionIndex();
-                
-                if(tableModel.getValueAt(selectedRowIndex, COLUMN_INDEX_OF_TOPIC_OWNER_ID).equals(user.getId())){
-                    btnDeleteTopic.setVisible(true);
-                } else {
-                	btnDeleteTopic.setVisible(false);
-                }
-            } else {
-            	btnDeleteTopic.setVisible(false);
-            }*/
-
-        }
-    }
-    
     @Override
     public void dispose(){
     	super.dispose();
     	
     	controller.handleWindowClose();
+    }
+	
+    private class SharedUserListSelectionHandler implements ListSelectionListener {
+        public void valueChanged(ListSelectionEvent e) { 
+            ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+            // TODO Implement private messaging on user selection...
+
+            if (!lsm.isSelectionEmpty()) {
+                int selectedRowIndex = lsm.getMinSelectionIndex();
+            } else {
+            }
+
+        }
+    }
+    
+    private class SharedMessageListSelectionHandler implements ListSelectionListener {
+        public void valueChanged(ListSelectionEvent e) { 
+            ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+ 
+            // TODO Implement private messaging on message selection...
+
+            if (!lsm.isSelectionEmpty()) {
+                int selectedRowIndex = lsm.getMinSelectionIndex();
+            } else {
+            }
+
+        }
     }
 }

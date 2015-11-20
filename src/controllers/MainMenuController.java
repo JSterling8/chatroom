@@ -1,5 +1,6 @@
 package controllers;
 
+import java.awt.Frame;
 import java.util.List;
 import java.util.UUID;
 
@@ -81,8 +82,12 @@ public class MainMenuController {
 	public void logout() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				frame.setVisible(false);
-				frame.dispose();
+				Frame[] frames = Frame.getFrames();
+				
+				for(Frame frame : frames){
+					frame.setVisible(false);
+					frame.dispose();
+				}
 
 				new LoginFrame();
 			}

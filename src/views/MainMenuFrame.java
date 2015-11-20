@@ -59,7 +59,7 @@ public class MainMenuFrame extends JFrame {
 			Class<?> columnClass = table.getColumnClass(i);
 			table.setDefaultEditor(columnClass, null);
 		}
-		table.getSelectionModel().addListSelectionListener(new SharedListSelectionHandler());
+		table.getSelectionModel().addListSelectionListener(new TopicListSelectionHandler());
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(0, 0, 630, 503);
@@ -142,7 +142,7 @@ public class MainMenuFrame extends JFrame {
 		return controller;
 	}
 	
-    private class SharedListSelectionHandler implements ListSelectionListener {
+    private class TopicListSelectionHandler implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) { 
             ListSelectionModel lsm = (ListSelectionModel)e.getSource();
  
