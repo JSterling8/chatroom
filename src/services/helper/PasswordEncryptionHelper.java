@@ -12,9 +12,7 @@ import javax.crypto.spec.PBEKeySpec;
  * 
  * Encrypts and decrypts passwords using the PBKDF2 algorithm.
  * 
- * FIXME - This is from https://gist.github.com/jtan189/3804290.  There is no license for its use.  BCrypt is generally better and this library is free to use: http://www.mindrot.org/projects/jBCrypt/
- * 
- * @author anon
+ * <b>This code is not my own</b>.  It borrows heavily from https://gist.github.com/jtan189/3804290  
  *
  */
 public class PasswordEncryptionHelper {
@@ -51,11 +49,13 @@ public class PasswordEncryptionHelper {
 
 	public static boolean validatePassword(char[] password, String goodHash)
 			throws NoSuchAlgorithmException, InvalidKeySpecException {
-		// Decode the hash into its parameters
+		// Decode the hash into its 3 parameters
 		String[] params = goodHash.split(":");
+		
 		int iterations = Integer.parseInt(params[ITERATION_INDEX]);
 		byte[] salt = fromHex(params[SALT_INDEX]);
 		byte[] hash = fromHex(params[HASH_INDEX]);
+		
 		// Compute the hash of the provided password, using the same salt,
 		// iteration count, and hash length
 		byte[] testHash = createHash(password, salt, iterations, hash.length);
@@ -84,7 +84,9 @@ public class PasswordEncryptionHelper {
 	private static String toHex(byte[] array) {
 		BigInteger bi = new BigInteger(1, array);
 		String hex = bi.toString(16);
+		
 		int paddingLength = (array.length * 2) - hex.length();
+		
 		if (paddingLength > 0) {
 			return String.format("%0" + paddingLength + "d", 0) + hex;
 		} else {

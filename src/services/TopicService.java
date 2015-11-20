@@ -15,13 +15,13 @@ import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionException;
-import net.jini.space.JavaSpace;
+import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
 
 public class TopicService {
 	private static TopicService topicService;
 
-	private JavaSpace space = SpaceService.getSpace();
+	private JavaSpace05 space = SpaceService.getSpace();
 	private EntryLookupHelper lookupHelper = new EntryLookupHelper();
 	
 	private TopicService() {

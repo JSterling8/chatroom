@@ -8,18 +8,15 @@ import exceptions.DuplicateEntryException;
 import exceptions.ResourceNotFoundException;
 import models.JMSUser;
 import net.jini.core.entry.UnusableEntryException;
-import net.jini.core.transaction.CannotAbortException;
-import net.jini.core.transaction.CannotCommitException;
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionException;
-import net.jini.core.transaction.UnknownTransactionException;
-import net.jini.space.JavaSpace;
+import net.jini.space.JavaSpace05;
 import services.helper.TransactionHelper;
 
 public class UserService {
 	private static final long THIRTY_DAYS_IN_MILLIS = 1000l * 60l * 60l * 24l * 30l;
 
-	private static final JavaSpace space = SpaceService.getSpace();
+	private static final JavaSpace05 space = SpaceService.getSpace();
 	
 	private static UserService userService;
 	

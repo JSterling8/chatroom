@@ -1,10 +1,13 @@
 package services;
 
+import java.rmi.AccessException;
+
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.core.lookup.ServiceTemplate;
 import net.jini.core.transaction.server.TransactionManager;
 import net.jini.space.JavaSpace;
+import net.jini.space.JavaSpace05;
 
 /**
  * This is Dr. Gary Allen's SpaceUtils class, which I've renamed and made a few
@@ -14,25 +17,30 @@ import net.jini.space.JavaSpace;
  *
  */
 public class SpaceService {
-	public static JavaSpace getSpace(String hostname) {
-		JavaSpace js = null;
-		try {
-			LookupLocator l = new LookupLocator("jini://" + hostname);
-
-			ServiceRegistrar sr = l.getRegistrar();
-
-			Class c = Class.forName("net.jini.space.JavaSpace");
-			Class[] classTemplate = { c };
-
-			js = (JavaSpace) sr.lookup(new ServiceTemplate(null, classTemplate, null));
-
-		} catch (Exception e) {
-			System.err.println("Error: " + e);
+	private static JavaSpace05 space;
+	
+	public static JavaSpace05 getSpace(String hostname) {		
+		if(space == null) {
+			try {
+				LookupLocator l = new LookupLocator("jini://" + hostname);
+	
+				ServiceRegistrar sr = l.getRegistrar();
+	
+				Class c = Class.forName("net.jini.space.JavaSpace");
+				Class[] classTemplate = { c };
+	
+				space = (JavaSpace05) sr.lookup(new ServiceTemplate(null, classTemplate, null));
+	
+			} catch (Exception e) {
+				System.err.println("Failed to get space");
+				e.printStackTrace();
+			}
 		}
-		return js;
+		
+		return space;
 	}
 
-	public static JavaSpace getSpace() {
+	public static JavaSpace05 getSpace() {
 		return getSpace("localhost");
 	}
 

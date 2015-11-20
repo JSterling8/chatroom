@@ -3,20 +3,19 @@ package services;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import exceptions.DuplicateEntryException;
 import models.JMSMessage;
 import models.JMSTopic;
 import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionException;
-import net.jini.space.JavaSpace;
+import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
 
 public class MessageService {
 	private static MessageService messageService;
 
-	private JavaSpace space = SpaceService.getSpace();
+	private JavaSpace05 space = SpaceService.getSpace();
 	private EntryLookupHelper lookupHelper = new EntryLookupHelper();
 	
 	private MessageService(){}
