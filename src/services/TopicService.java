@@ -20,6 +20,7 @@ import net.jini.core.transaction.server.TransactionManager;
 import net.jini.core.transaction.Transaction.Created;
 import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
+import services.helper.TransactionHelper;
 
 public class TopicService {
 	private static TopicService topicService;
@@ -42,9 +43,7 @@ public class TopicService {
 		Transaction transaction = null;
 
 		try {
-			TransactionManager transactionManager = SpaceService.getManager();
-			Created transactionCreated = TransactionFactory.create(transactionManager, 1000 * 10);
-			transaction = transactionCreated.transaction;
+			transaction = TransactionHelper.getTransaction(3000);
 			
 			if (isValidTopic(topic) && !topicExistsInSpace(topic, transaction)) {
 				space.write(topic, transaction, Lease.FOREVER);
@@ -140,7 +139,7 @@ public class TopicService {
 				space.write(topicUser, null, Lease.FOREVER);
 			}
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed to add user to topic");
 			e.printStackTrace();
 		}
 	}

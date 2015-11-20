@@ -7,14 +7,11 @@ import models.JMSMessage;
 import models.JMSTopic;
 import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.lease.Lease;
-import net.jini.core.lease.LeaseDeniedException;
 import net.jini.core.transaction.Transaction;
-import net.jini.core.transaction.Transaction.Created;
 import net.jini.core.transaction.TransactionException;
-import net.jini.core.transaction.TransactionFactory;
-import net.jini.core.transaction.server.TransactionManager;
 import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
+import services.helper.TransactionHelper;
 
 public class MessageService {
 	private static MessageService messageService;
@@ -72,14 +69,12 @@ public class MessageService {
 			
 			List<JMSMessage> topicMessages = entryLookupHelper.findAllMatchingTemplate(space, template);
 			
-			TransactionManager transactionManager = SpaceService.getManager();
-			Created transactionCreated = TransactionFactory.create(transactionManager, 2000);
-			Transaction transaction = transactionCreated.transaction;
+			Transaction transaction = TransactionHelper.getTransaction(3000);
 			
 			for(JMSMessage message : topicMessages){
-				space.takeIfExists(message, transaction, 100);
+				space.takeIfExists(message, transaction, 1000);
 			}
-		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException | LeaseDeniedException e) {
+		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
 			System.err.println("Failed to delete Topic Messages");
 			e.printStackTrace();
 		}

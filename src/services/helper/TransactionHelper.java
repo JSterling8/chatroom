@@ -21,7 +21,6 @@ public class TransactionHelper {
 			transactionCreated = TransactionFactory.create(transactionManager, timeout);
 			transaction = transactionCreated.transaction;
 		} catch (LeaseDeniedException | RemoteException e) {
-			// TODO Auto-generated catch block
 			System.err.println("Failed to create transaction.");
 			e.printStackTrace();
 		}
