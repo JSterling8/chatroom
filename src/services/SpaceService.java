@@ -1,12 +1,9 @@
 package services;
 
-import java.rmi.AccessException;
-
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.core.lookup.ServiceTemplate;
 import net.jini.core.transaction.server.TransactionManager;
-import net.jini.space.JavaSpace;
 import net.jini.space.JavaSpace05;
 
 /**
@@ -41,7 +38,7 @@ public class SpaceService {
 	}
 
 	public static JavaSpace05 getSpace() {
-		return getSpace("localhost");
+		return getSpace("waterloo");
 	}
 
 	public static TransactionManager getManager(String hostname) {
@@ -67,6 +64,6 @@ public class SpaceService {
 	}
 
 	public static TransactionManager getManager() {
-		return getManager("localhost");
+		return getManager("waterloo");
 	}
 }
