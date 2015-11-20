@@ -15,6 +15,9 @@ import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionException;
+import net.jini.core.transaction.TransactionFactory;
+import net.jini.core.transaction.server.TransactionManager;
+import net.jini.core.transaction.Transaction.Created;
 import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
 
@@ -39,27 +42,28 @@ public class TopicService {
 		Transaction transaction = null;
 
 		try {
-			/*TransactionManager transactionManager = SpaceService.getManager();
+			TransactionManager transactionManager = SpaceService.getManager();
 			Created transactionCreated = TransactionFactory.create(transactionManager, 1000 * 10);
-			transaction = transactionCreated.transaction;*/
+			transaction = transactionCreated.transaction;
+			
 			if (isValidTopic(topic) && !topicExistsInSpace(topic, transaction)) {
 				space.write(topic, transaction, Lease.FOREVER);
-				/*transaction.commit();*/
+				transaction.commit();
 			} else {
 				// TODO Throw new invalid topic exception (i.e., id or something
 				// is missing). Or already exists.
 				throw new DuplicateEntryException("Failed to create topic.  Topic baseName or id matches with an existing topic.");
 			}
 
-		} catch (Exception e) {
-/*			if (transaction != null) {
+		} catch (Exception e) {			
+			if (transaction != null) {
 				try {
 					transaction.abort();
 				} catch (Exception e1) {
 					System.err.println("Failed to abort transaction");
 					e1.printStackTrace();
 				}
-			}*/
+			}
 
 			throw e;
 		}
