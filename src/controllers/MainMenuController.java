@@ -40,7 +40,7 @@ public class MainMenuController {
 		// TODO Get topic from JavaSpace to verify it exists.
 		JMSTopic topic = topicService.getTopicById(topicId);
 
-		ChatroomFrame chatroomFrame = new ChatroomFrame(topic, user);
+		new ChatroomFrame(topic, user);
 	}
 
 	public void handleDeleteTopicPressed(int tableModelRow, UUID topicId) {

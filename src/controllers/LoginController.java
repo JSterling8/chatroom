@@ -33,8 +33,6 @@ public class LoginController {
 		if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
 			JOptionPane.showMessageDialog(loginFrame, "Please enter a username or password to continue.");
 		} else {
-			boolean success = false;
-
 			JMSUser template = new JMSUser();
 			template.setName(username);
 
