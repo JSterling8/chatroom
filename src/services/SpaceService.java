@@ -1,5 +1,9 @@
 package services;
 
+import java.util.Properties;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.core.lookup.ServiceTemplate;
@@ -15,6 +19,8 @@ import net.jini.space.JavaSpace05;
  */
 public class SpaceService {
 	private static JavaSpace05 space;
+	private static final Properties properties = new Properties();
+
 	
 	public static JavaSpace05 getSpace(String hostname) {		
 		if(space == null) {
@@ -38,7 +44,13 @@ public class SpaceService {
 	}
 
 	public static JavaSpace05 getSpace() {
-		return getSpace("waterloo");
+		String proxyHost = properties.getProperty("http.proxyHost");
+		
+		if(StringUtils.equals("wwwproxy.hud.ac.uk", proxyHost)){
+			return getSpace("waterloo");
+		} else {
+			return getSpace("localhost");
+		}
 	}
 
 	public static TransactionManager getManager(String hostname) {
@@ -64,6 +76,11 @@ public class SpaceService {
 	}
 
 	public static TransactionManager getManager() {
-		return getManager("waterloo");
-	}
+		String proxyHost = properties.getProperty("http.proxyHost");
+		
+		if(StringUtils.equals("wwwproxy.hud.ac.uk", proxyHost)){
+			return getManager("waterloo");
+		} else {
+			return getManager("localhost");
+		}	}
 }
