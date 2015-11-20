@@ -29,7 +29,7 @@ public class EntryLookupHelper {
 			templateList.add(template);
 			
 			//TODO - Assert there are never more than 20000 entries in the space?
-			MatchSet matchSet = space.contents(templateList, transaction, Long.MAX_VALUE, 20000);
+			MatchSet matchSet = space.contents(templateList, transaction, 500, 20000);
 			
 			T entry = (T) matchSet.next();
 			while(entry != null){
