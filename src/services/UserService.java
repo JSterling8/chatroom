@@ -66,7 +66,7 @@ public class UserService {
 				space.write(user, transaction, THIRTY_DAYS_IN_MILLIS);
 				transaction.commit();
 			} catch (RemoteException | TransactionException | InterruptedException | UnusableEntryException e) {
-				// TODO Auto-generated catch block
+				System.err.println("Failed to renew user's lease");
 				e.printStackTrace();
 			}
 		} else {
@@ -75,7 +75,6 @@ public class UserService {
 	}
 	
 	private boolean isValidUser(JMSUser user) {
-		// TODO Auto-generated method stub
 		if(StringUtils.isNotBlank(user.getBaseName()) &&
 				StringUtils.isNotBlank(user.getName()) &&
 				StringUtils.isNotBlank(user.getId().toString()) &&

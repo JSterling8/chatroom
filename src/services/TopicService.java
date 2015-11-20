@@ -184,7 +184,9 @@ public class TopicService {
 
 			}
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
-			// TODO Better error handling?
+			System.err.println("Failed to remove user from topic.  "
+					+ "User ID: '" + user.getId().toString() 
+					+ "' && Topic ID: '" + topic.getId().toString() + "'");
 			e.printStackTrace();
 		}
 	}
