@@ -19,7 +19,7 @@ import net.jini.space.JavaSpace05;
  */
 public class SpaceService {
 	private static JavaSpace05 space;
-	private static final String proxyHost = new Properties().getProperty("http.proxyHost");
+	private static final String proxyHost = System.getProperties().getProperty("http.proxyHost");
 
 	public static JavaSpace05 getSpace(String hostname) {
 		if (space == null) {
@@ -42,7 +42,7 @@ public class SpaceService {
 		return space;
 	}
 
-	public static JavaSpace05 getSpace() {
+	public static JavaSpace05 getSpace() {		
 		if (StringUtils.equals("wwwproxy.hud.ac.uk", proxyHost)) {
 			return getSpace("waterloo");
 		} else {
