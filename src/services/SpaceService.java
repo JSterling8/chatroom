@@ -19,34 +19,31 @@ import net.jini.space.JavaSpace05;
  */
 public class SpaceService {
 	private static JavaSpace05 space;
-	private static final Properties properties = new Properties();
+	private static final String proxyHost = new Properties().getProperty("http.proxyHost");
 
-	
-	public static JavaSpace05 getSpace(String hostname) {		
-		if(space == null) {
+	public static JavaSpace05 getSpace(String hostname) {
+		if (space == null) {
 			try {
 				LookupLocator l = new LookupLocator("jini://" + hostname);
-	
+
 				ServiceRegistrar sr = l.getRegistrar();
-	
+
 				Class c = Class.forName("net.jini.space.JavaSpace");
 				Class[] classTemplate = { c };
-	
+
 				space = (JavaSpace05) sr.lookup(new ServiceTemplate(null, classTemplate, null));
-	
+
 			} catch (Exception e) {
 				System.err.println("Failed to get space");
 				e.printStackTrace();
 			}
 		}
-		
+
 		return space;
 	}
 
 	public static JavaSpace05 getSpace() {
-		String proxyHost = properties.getProperty("http.proxyHost");
-		
-		if(StringUtils.equals("wwwproxy.hud.ac.uk", proxyHost)){
+		if (StringUtils.equals("wwwproxy.hud.ac.uk", proxyHost)) {
 			return getSpace("waterloo");
 		} else {
 			return getSpace("localhost");
@@ -76,11 +73,10 @@ public class SpaceService {
 	}
 
 	public static TransactionManager getManager() {
-		String proxyHost = properties.getProperty("http.proxyHost");
-		
-		if(StringUtils.equals("wwwproxy.hud.ac.uk", proxyHost)){
+		if (StringUtils.equals("wwwproxy.hud.ac.uk", proxyHost)) {
 			return getManager("waterloo");
 		} else {
 			return getManager("localhost");
-		}	}
+		}
+	}
 }
