@@ -20,7 +20,9 @@ import services.TopicService;
 import views.ChatroomFrame;
 
 public class ChatroomController {
-	//TODO Spam prevention
+	// FIXME Private messages that are seen by sender, recipient, and topic owner
+	// FIXME Notifications for messages and private messages
+	// TODO Spam prevention
 	// TODO Topic deleted notification?
 	private ChatroomFrame frame;
 	private DefaultTableModel messagesTableModel;

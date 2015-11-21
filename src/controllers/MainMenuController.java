@@ -16,8 +16,9 @@ import services.TopicService;
 import views.ChatroomFrame;
 import views.LoginFrame;
 import views.MainMenuFrame;
-//TODO -- Application in general needs notifications.
+
 public class MainMenuController {
+	//FIXME -- Notifications for Topics (to replace 10-second auto-refresh)
 	private static TopicService topicService = TopicService.getTopicService();
 	
 	private MainMenuFrame frame;
