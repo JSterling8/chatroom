@@ -21,9 +21,7 @@ public class EntryLookupHelper {
 		List<T> entries = new ArrayList<T>();
 
 		try {
-			TransactionManager transactionManager = SpaceService.getManager();
-			Created transactionCreated = TransactionFactory.create(transactionManager, 1000 * 3);
-			transaction = transactionCreated.transaction;
+			transaction = TransactionHelper.getTransaction();
 
 			List<T> templateList = new ArrayList<T>(1);
 			templateList.add(template);

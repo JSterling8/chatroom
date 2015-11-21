@@ -2,17 +2,23 @@ package views;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.UUID;
 
+import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -23,8 +29,6 @@ import controllers.MainMenuController;
 import models.JMSUser;
 
 public class MainMenuFrame extends JFrame {
-	//TODO Pressing enter should join the selected chat.
-	//TODO Double clicking should join the selected chat.
 	//TODO Refresh the table model every x seconds (or put a refresh button?)
 	private static final int COLUMN_INDEX_OF_TOPIC_ID = 4;
 
@@ -60,6 +64,18 @@ public class MainMenuFrame extends JFrame {
 			table.setDefaultEditor(columnClass, null);
 		}
 		table.getSelectionModel().addListSelectionListener(new TopicListSelectionHandler());
+		table.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent mouseEvent){
+				JTable table = (JTable) mouseEvent.getSource();
+				Point point = mouseEvent.getPoint();
+				int selectedRow = table.rowAtPoint(point);
+				if(mouseEvent.getClickCount() == 2){
+					UUID topicId = (UUID) table.getModel().getValueAt(selectedRow, COLUMN_INDEX_OF_TOPIC_ID);
+					controller.handleJoinTopicPressed(topicId);
+				}
+			}
+		});
+		createKeyBindings(table);
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(0, 0, 630, 503);
@@ -141,6 +157,18 @@ public class MainMenuFrame extends JFrame {
 	public MainMenuController getController() {
 		return controller;
 	}
+	
+	private void createKeyBindings(JTable table) {
+		table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
+		    table.getActionMap().put("Enter", new AbstractAction() {
+		        @Override
+		        public void actionPerformed(ActionEvent ae) {
+		            int selectedRow = table.getSelectedRow();
+		            UUID topicId = (UUID) table.getModel().getValueAt(selectedRow, COLUMN_INDEX_OF_TOPIC_ID);
+		            controller.handleJoinTopicPressed(topicId);
+		        }
+		    });
+		}
 	
     private class TopicListSelectionHandler implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent e) { 
