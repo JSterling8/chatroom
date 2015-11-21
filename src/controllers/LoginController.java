@@ -29,7 +29,6 @@ public class LoginController {
 	}
 
 	public void handleLoginButtonPressed(String username, String password) {
-		// TODO Implement method fully
 		if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
 			JOptionPane.showMessageDialog(loginFrame, "Please enter a username or password to continue.");
 		} else {

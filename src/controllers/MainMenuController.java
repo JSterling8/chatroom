@@ -16,7 +16,7 @@ import services.TopicService;
 import views.ChatroomFrame;
 import views.LoginFrame;
 import views.MainMenuFrame;
-
+//TODO -- Application in general needs notifications.
 public class MainMenuController {
 	private static TopicService topicService = TopicService.getTopicService();
 	
@@ -37,7 +37,6 @@ public class MainMenuController {
 	}
 	
 	public void handleJoinTopicPressed(UUID topicId) {
-		// TODO Get topic from JavaSpace to verify it exists.
 		JMSTopic topic = topicService.getTopicById(topicId);
 
 		new ChatroomFrame(topic, user);
@@ -51,7 +50,8 @@ public class MainMenuController {
 
 			tableModel.removeRow(tableModelRow);
 		} else {
-			// TODO Unauthorized exception.
+			JOptionPane.showInternalMessageDialog(frame, "Failed to delete topic.  " + 
+					"You are not the topic owner", "Topic Deletion Failed", JOptionPane.ERROR_MESSAGE, null);
 		}
 	}
 

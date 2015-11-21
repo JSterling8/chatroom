@@ -15,6 +15,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -104,7 +105,8 @@ public class MainMenuFrame extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				int selectedRow = table.getSelectedRow();
 				if(selectedRow == -1){
-					//TODO Throw error dialogue saying nothing is selected to join
+					JOptionPane.showInternalMessageDialog(MainMenuFrame.this, "Failed to join topic.  " + 
+							"No topic selected", "Join Failed", JOptionPane.ERROR_MESSAGE, null);
 				} else {
 					UUID topicIdToJoin = (UUID) tableModel.getValueAt(selectedRow, COLUMN_INDEX_OF_TOPIC_ID);
 					controller.handleJoinTopicPressed(topicIdToJoin);
@@ -119,7 +121,8 @@ public class MainMenuFrame extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				int selectedRow = table.getSelectedRow();
 				if(selectedRow == -1){
-					//TODO Throw error dialogue saying nothing is selected to delete
+					JOptionPane.showInternalMessageDialog(MainMenuFrame.this, "Failed to delete topic.  " + 
+													"No topic selected", "Topic Deletion Failed", JOptionPane.ERROR_MESSAGE, null);
 				} else {
 					UUID topicIdToDelete = (UUID) tableModel.getValueAt(selectedRow, COLUMN_INDEX_OF_TOPIC_ID);
 					controller.handleDeleteTopicPressed(selectedRow, topicIdToDelete);

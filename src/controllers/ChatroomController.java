@@ -21,6 +21,7 @@ import views.ChatroomFrame;
 
 public class ChatroomController {
 	//TODO Spam prevention
+	// TODO Topic deleted notification?
 	private ChatroomFrame frame;
 	private DefaultTableModel messagesTableModel;
 	private DefaultTableModel usersTableModel;
@@ -90,9 +91,8 @@ public class ChatroomController {
 				messageService.createPublicMessage(new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), text));
 				successfullyAddedToSpace = true;
 			} catch (Exception e) {
-				// TODO Finer error catching.
-				// No real need to print stack trace at the moment.  This could happen for legitimate reasons.
-				// TODO Topic deleted notification?
+				System.err.println("Failed to create public message in topic.");
+				e.printStackTrace();
 			}
 			
 			if(successfullyAddedToSpace){

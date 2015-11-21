@@ -49,8 +49,6 @@ public class TopicService {
 				space.write(topic, transaction, Lease.FOREVER);
 				transaction.commit();
 			} else {
-				// TODO Throw new invalid topic exception (i.e., id or something
-				// is missing). Or already exists.
 				throw new DuplicateEntryException("Failed to create topic.  Topic baseName or id matches with an existing topic.");
 			}
 
@@ -94,10 +92,11 @@ public class TopicService {
 
 		try {
 			topic = (JMSTopic) space.readIfExists(template, null, 1000);
-		} catch (Exception e) {
-			// TODO Finer error handling
+		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
+			System.err.println("Failed to get topic by ID.  Topic ID queried: '" + id.toString() + "'");
 			e.printStackTrace();
 		}
+
 
 		return topic;
 	}
@@ -125,7 +124,8 @@ public class TopicService {
 				space.takeIfExists(template, null, 1000);
 			}
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
-			// TODO Finer error handling?
+			System.err.println("Failed to delete all users from Topic entitled: '" + 
+								topic.getName() +"' with ID: '" + topic.getId().toString() + "'");
 			e.printStackTrace();
 		}
 	}

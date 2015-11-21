@@ -34,30 +34,10 @@ public class MessageService {
 	}
 	
 	public void createPublicMessage(JMSMessage message) throws Exception{
-		Transaction transaction = null;
-
-		try {
-			if(TopicService.getTopicService().getTopicById(message.getTopic().getId()) != null){
-				/*TransactionManager transactionManager = SpaceService.getManager();
-				Created transactionCreated = TransactionFactory.create(transactionManager, 1000 * 10);
-				transaction = transactionCreated.transaction;*/
-				space.write(message, transaction, Lease.FOREVER);
-				/*transaction.commit();*/
-			} else {
-				throw new Exception("Topic no longer exists.  Perhaps it has been deleted?");
-			}
-
-		} catch (Exception e) {
-/*			if (transaction != null) {
-				try {
-					transaction.abort();
-				} catch (Exception e1) {
-					System.err.println("Failed to abort transaction");
-					e1.printStackTrace();
-				}
-			}*/
-			//TODO Finer error catching.
-			throw e;
+		if(TopicService.getTopicService().getTopicById(message.getTopic().getId()) != null){
+			space.write(message, null, Lease.FOREVER);
+		} else {
+			throw new Exception("Topic no longer exists.  Perhaps it has been deleted?");
 		}
 	}
 
