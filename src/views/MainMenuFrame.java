@@ -29,7 +29,7 @@ import controllers.MainMenuController;
 import models.JMSUser;
 
 public class MainMenuFrame extends JFrame {
-	//TODO Refresh the table model every x seconds (or put a refresh button?)
+	//TODO Put a refresh button?
 	private static final int COLUMN_INDEX_OF_TOPIC_ID = 4;
 
 	private static final int COLUMN_INDEX_OF_TOPIC_OWNER_ID = 3;
@@ -52,11 +52,8 @@ public class MainMenuFrame extends JFrame {
 		getContentPane().add(panel);
 		panel.setLayout(null);
 
-		tableModel = controller.generateTopicTableModel();
-
 		JTable table = new JTable(tableModel);
-		table.removeColumn(table.getColumnModel().getColumn(COLUMN_INDEX_OF_TOPIC_OWNER_ID));
-		table.removeColumn(table.getColumnModel().getColumn(COLUMN_INDEX_OF_TOPIC_ID - 1));  // -1 is because index 4 becomes index 3 after the column in the line above is removed
+		updateTopicList(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		// Makes cells non editable.
 		for(int i = 0; i <table.getColumnCount(); i++){
@@ -76,6 +73,16 @@ public class MainMenuFrame extends JFrame {
 			}
 		});
 		createKeyBindings(table);
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(10000);
+					updateTopicList(table);
+				} catch (Exception e) {
+					System.err.println("Failed to update topic list.  Might be unrecoverable.  Topic list may no longer refresh/update.");
+				}
+			}
+		}).start();
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(0, 0, 630, 503);
@@ -156,6 +163,13 @@ public class MainMenuFrame extends JFrame {
 
 	public MainMenuController getController() {
 		return controller;
+	}
+	
+	private void updateTopicList(JTable table) {
+		tableModel = controller.generateTopicTableModel();
+		table.setModel(tableModel);
+		table.removeColumn(table.getColumnModel().getColumn(COLUMN_INDEX_OF_TOPIC_OWNER_ID));
+		table.removeColumn(table.getColumnModel().getColumn(COLUMN_INDEX_OF_TOPIC_ID - 1));  // -1 is because index 4 becomes index 3 after the column in the line above is removed
 	}
 	
 	private void createKeyBindings(JTable table) {

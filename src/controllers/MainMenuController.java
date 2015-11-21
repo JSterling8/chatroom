@@ -75,7 +75,7 @@ public class MainMenuController {
 		DefaultTableModel tableModel = new DefaultTableModel(data, columns);
 
 		this.tableModel = tableModel;
-
+		
 		return tableModel;
 	}
 
