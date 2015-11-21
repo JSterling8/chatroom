@@ -27,15 +27,13 @@ import javax.swing.table.DefaultTableModel;
 
 import controllers.MainMenuController;
 import models.JMSUser;
+import java.awt.event.ActionListener;
 
 public class MainMenuFrame extends JFrame {
-	//TODO Put a refresh button?
-	private static final int COLUMN_INDEX_OF_TOPIC_ID = 4;
-
-	private static final int COLUMN_INDEX_OF_TOPIC_OWNER_ID = 3;
-
 	private static final long serialVersionUID = -1262155724457779827L;
-
+	private static final int COLUMN_INDEX_OF_TOPIC_ID = 4;
+	private static final int COLUMN_INDEX_OF_TOPIC_OWNER_ID = 3;
+	
 	private MainMenuController controller;
 	private DefaultTableModel tableModel;
 	private JButton btnDeleteTopic;
@@ -137,23 +135,41 @@ public class MainMenuFrame extends JFrame {
 				controller.logout();
 			}
 		});
+		
+		JButton btnRefreshList = new JButton("Refresh List");
+		btnRefreshList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				updateTopicList(table);
+			}
+		});
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
-		gl_panel_1
-				.setHorizontalGroup(
-						gl_panel_1.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel_1.createSequentialGroup().addContainerGap()
-										.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-												.addComponent(btnCreateTopic, GroupLayout.DEFAULT_SIZE, 172,
-														Short.MAX_VALUE)
-										.addComponent(btnJoinTopic, GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
-										.addComponent(btnDeleteTopic, GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
-										.addComponent(btnLogout, GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE))
-						.addContainerGap()));
-		gl_panel_1.setVerticalGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_1.createSequentialGroup().addContainerGap().addComponent(btnCreateTopic)
-						.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnJoinTopic)
-						.addPreferredGap(ComponentPlacement.RELATED, 350, Short.MAX_VALUE).addComponent(btnDeleteTopic)
-						.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnLogout).addContainerGap()));
+		gl_panel_1.setHorizontalGroup(
+			gl_panel_1.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_1.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnDeleteTopic, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+						.addComponent(btnLogout, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+						.addComponent(btnCreateTopic, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+						.addComponent(btnJoinTopic, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+						.addComponent(btnRefreshList, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))
+					.addContainerGap())
+		);
+		gl_panel_1.setVerticalGroup(
+			gl_panel_1.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(btnRefreshList)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnCreateTopic)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnJoinTopic)
+					.addPreferredGap(ComponentPlacement.RELATED, 331, Short.MAX_VALUE)
+					.addComponent(btnDeleteTopic)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnLogout)
+					.addContainerGap())
+		);
 		panel_1.setLayout(gl_panel_1);
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -202,6 +218,6 @@ public class MainMenuFrame extends JFrame {
             	btnJoinTopic.setEnabled(false);
             }
 
-        }
-    }
+		}
+	}
 }
