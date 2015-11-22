@@ -18,9 +18,9 @@ import views.LoginFrame;
 import views.MainMenuFrame;
 
 public class MainMenuController {
-	//FIXME -- Notifications for Topics (to replace 10-second auto-refresh)
+	// FIXME -- Notifications for Topics (to replace 10-second auto-refresh)
 	private static TopicService topicService = TopicService.getTopicService();
-	
+
 	private MainMenuFrame frame;
 	private DefaultTableModel tableModel;
 	private JMSUser user;
@@ -36,7 +36,7 @@ public class MainMenuController {
 			createTopic(topicName);
 		}
 	}
-	
+
 	public void handleJoinTopicPressed(UUID topicId) {
 		JMSTopic topic = topicService.getTopicById(topicId);
 
@@ -51,20 +51,20 @@ public class MainMenuController {
 
 			tableModel.removeRow(tableModelRow);
 		} else {
-			JOptionPane.showInternalMessageDialog(frame, "Failed to delete topic.  " + 
-					"You are not the topic owner", "Topic Deletion Failed", JOptionPane.ERROR_MESSAGE, null);
+			JOptionPane.showInternalMessageDialog(frame, "Failed to delete topic.  " + "You are not the topic owner",
+					"Topic Deletion Failed", JOptionPane.ERROR_MESSAGE, null);
 		}
 	}
 
 	public DefaultTableModel generateTopicTableModel() {
 		Object[] columns = { "Topic", "Owner", "User Count", "Owner ID", "Topic ID" };
 		List<JMSTopic> topics = topicService.getAllTopics();
-		
+
 		Object[][] data = {};
-		
-		if(topics != null && topics.size() > 0){
+
+		if (topics != null && topics.size() > 0) {
 			data = new Object[topics.size()][5];
-			for(int i = 0; i < topics.size(); i++){
+			for (int i = 0; i < topics.size(); i++) {
 				data[i][0] = topics.get(i).getName();
 				data[i][1] = topics.get(i).getOwner().getName();
 				data[i][2] = topics.get(i).getUsers();
@@ -76,7 +76,7 @@ public class MainMenuController {
 		DefaultTableModel tableModel = new DefaultTableModel(data, columns);
 
 		this.tableModel = tableModel;
-		
+
 		return tableModel;
 	}
 
@@ -84,8 +84,8 @@ public class MainMenuController {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				Frame[] frames = Frame.getFrames();
-				
-				for(Frame frame : frames){
+
+				for (Frame frame : frames) {
 					frame.setVisible(false);
 					frame.dispose();
 				}
@@ -94,17 +94,17 @@ public class MainMenuController {
 			}
 		});
 	}
-	
+
 	private void createTopic(String name) {
 		JMSTopic topic = new JMSTopic(name, user, 1);
 		boolean success = true;
 
-		try{
+		try {
 			topicService.createTopic(topic);
-		} catch (Exception e){
+		} catch (Exception e) {
 			success = false;
 		}
-		
+
 		if (success) {
 			Object[] rowData = { topic.getName(), topic.getOwner().getName(), topic.getUsers(),
 					topic.getOwner().getId(), topic.getId() };
