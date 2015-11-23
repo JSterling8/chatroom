@@ -39,7 +39,7 @@ import services.UserService;
 import views.ChatroomFrame;
 import views.ColoredTable;
 
-public class ChatroomController implements Serializable, RemoteEventListener {
+public class ChatroomController implements Serializable {
 	// FIXME Word wrap message cells.
 	// FIXME Private messages that are seen by sender, recipient, and topic owner
 	// FIXME Notifications for messages and private messages
@@ -233,46 +233,16 @@ public class ChatroomController implements Serializable, RemoteEventListener {
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			MessageRemoteEventListener eventListener = new MessageRemoteEventListener(this, topic, user);
-			theStub = (RemoteEventListener) myDefaultExporter.export(this);
+			theStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 				
 			space.registerForAvailabilityEvent(templates, 
 					null, 
 					true, 
 					theStub, 
 					Lease.FOREVER, // Should maybe not be forever?
-					new MarshalledObject("Not used"));
+					null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new message(s)");
-			e.printStackTrace();
-		}
-	}
-	
-	public void notify(RemoteEvent event) {
-		try {
-			AvailabilityEvent availEvent = (AvailabilityEvent) event;
-			JMSMessage message = (JMSMessage) availEvent.getEntry();
-			
-			if 	(		
-					message.getTo() == null ||
-					message.getTo().getId().equals(user.getId()) || 
-					message.getFrom().getId().equals(user.getId()) ||
-					topic.getOwner().getId().equals(user.getId())
-				) {
-				JMSUser userFrom = message.getFrom();
-				String messageText = message.getMessage();
-				Date sentDate = message.getSentDate();
-				Object[] rowData = { sentDate.toString(), userFrom.getName(), messageText };
-				messagesTableModel.addRow(rowData);
-				
-				// If it's a PM, mark it as such...
-				if(message.getTo() != null) {
-					colourBottomMessage();
-				}
-			} else {
-				// Not for us.  Ignore...
-			}
-		} catch (Exception e) {
-			System.err.println("Failed to run notify method in ChatroomController");
 			e.printStackTrace();
 		}
 	}
@@ -289,5 +259,9 @@ public class ChatroomController implements Serializable, RemoteEventListener {
 				JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
 		return new String(tfMessage.getText());
+	}
+
+	public DefaultTableModel getMessagesTableModel() {
+		return messagesTableModel;
 	}
 }

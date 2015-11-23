@@ -11,6 +11,7 @@ import models.JMSUser;
 import net.jini.core.event.RemoteEvent;
 import net.jini.core.event.RemoteEventListener;
 import net.jini.core.event.UnknownEventException;
+import net.jini.space.AvailabilityEvent;
 
 public class MessageRemoteEventListener implements RemoteEventListener, Serializable {
 	private static final long serialVersionUID = 7526472345622976341L;
@@ -26,10 +27,10 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 		this.user = user;
 	}
 	
-	@Override
 	public void notify(RemoteEvent event) {
 		try {
-			JMSMessage message = (JMSMessage) event.getSource();
+			AvailabilityEvent availEvent = (AvailabilityEvent) event;
+			JMSMessage message = (JMSMessage) availEvent.getEntry();
 			
 			if 	(		
 					message.getTo() == null ||
@@ -40,8 +41,8 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 				JMSUser userFrom = message.getFrom();
 				String messageText = message.getMessage();
 				Date sentDate = message.getSentDate();
-				Object[] rowData = { sentDate.toString(), userFrom, messageText };
-				controller.generateMessagesTableModel().addRow(rowData);
+				Object[] rowData = { sentDate.toString(), userFrom.getName(), messageText };
+				controller.getMessagesTableModel().addRow(rowData);
 				
 				// If it's a PM, mark it as such...
 				if(message.getTo() != null) {
@@ -51,7 +52,7 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 				// Not for us.  Ignore...
 			}
 		} catch (Exception e) {
-			System.err.println("Failed to run notify method");
+			System.err.println("Failed to run notify method in ChatroomController");
 			e.printStackTrace();
 		}
 	}
