@@ -1,10 +1,13 @@
 package controllers;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
@@ -17,13 +20,17 @@ import models.JMSTopicUser;
 import models.JMSUser;
 import services.MessageService;
 import services.TopicService;
+import services.UserService;
 import views.ChatroomFrame;
+import views.ColoredTable;
 
 public class ChatroomController {
+	// FIXME Word wrap message cells.
 	// FIXME Private messages that are seen by sender, recipient, and topic owner
 	// FIXME Notifications for messages and private messages
 	// TODO Spam prevention
 	// TODO Topic deleted notification?
+	private static final UserService userService = UserService.getUserService();
 	private ChatroomFrame frame;
 	private DefaultTableModel messagesTableModel;
 	private DefaultTableModel usersTableModel;
@@ -31,6 +38,8 @@ public class ChatroomController {
 	private TopicService topicService;
 	private JMSTopic topic;
 	private JMSUser user;
+	private String nameSendingMessageTo;
+	private List<Integer> rowsToHighlight = new ArrayList<Integer>();
 	
 	public ChatroomController(ChatroomFrame frame, JMSTopic topic, JMSUser user){
 		this.frame = frame;
@@ -45,7 +54,15 @@ public class ChatroomController {
 	
 	public DefaultTableModel generateMessagesTableModel() {
 		Object[] columns = { "Date/Time", "User", "Message", "Message ID" };
-		List<JMSMessage> messages = messageService.getAllMessagesForTopic(topic);
+		List<JMSMessage> messages = messageService.getAllMessagesForUserInTopic(topic, user);
+		
+		for(int i = 0; i < messages.size(); i++) {
+			JMSMessage message = messages.get(i);
+			
+			if(message.getTo() != null && StringUtils.isNotBlank(message.getTo().getName())){
+				rowsToHighlight.add(i);
+			}
+		}
 		
 		Object[][] data = {};
 		
@@ -60,7 +77,7 @@ public class ChatroomController {
 		}
 
 		messagesTableModel = new DefaultTableModel(data, columns);
-
+		
 		return messagesTableModel;
 	}
 	
@@ -82,19 +99,44 @@ public class ChatroomController {
 
 		return usersTableModel;
 	}
+	
+	public void setNameMessageTo(String name){
+		this.nameSendingMessageTo = name;
+	}
 
-	public void handleSubmitPressed() {
+	public void handleSubmitPressed(String text) {
 		JTextField tfMessageInput = frame.getTfMessageInput();
-		String text = tfMessageInput.getText();
+		boolean isPrivateMessage = false;
+		
+		// If text is not blank, it's a private message.
+		if(StringUtils.isBlank(text)){
+			text = tfMessageInput.getText();
+		}
 		
 		if(StringUtils.isNotBlank(text)){
 			boolean successfullyAddedToSpace = false;
 			try {
-				messageService.createPublicMessage(new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), text));
-				successfullyAddedToSpace = true;
+				if(StringUtils.isBlank(nameSendingMessageTo)){
+					messageService.createMessage(new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), text));
+					successfullyAddedToSpace = true;
+					isPrivateMessage = false;
+				} else {
+					String baseName = userService.getBaseNameFromName(nameSendingMessageTo);
+					JMSUser userTo = userService.getUserByBaseName(baseName);
+					text = "PM TO '" + userTo.getName() + "': "+ text;
+					
+					messageService.createMessage(new JMSMessage(topic, new Date(), user, userTo, UUID.randomUUID(), text));
+					successfullyAddedToSpace = true;
+					
+					// Reset this variable
+					nameSendingMessageTo = null;
+					isPrivateMessage = true;
+				}
 			} catch (Exception e) {
 				System.err.println("Failed to create public message in topic.");
 				e.printStackTrace();
+				
+				nameSendingMessageTo = null;
 			}
 			
 			if(successfullyAddedToSpace){
@@ -103,10 +145,20 @@ public class ChatroomController {
 			
 				scrollToBottomOfMessages();
 				tfMessageInput.setText(null);
+				
+				if(isPrivateMessage){
+					colourBottomMessageRed();
+				}
 			} else {
 				JOptionPane.showMessageDialog(frame, "Failed to send message to server.  Perhaps the owner has deleted the topic?");
 			}
 		}
+	}
+
+	private void colourBottomMessageRed() {
+		ColoredTable messagesTable = frame.getMessagesTable();
+		int lastRow = messagesTable.getRowCount() - 1;
+		messagesTable.setRowColor(lastRow, Color.RED);
 	}
 
 	private void scrollToBottomOfMessages() {
@@ -120,5 +172,47 @@ public class ChatroomController {
 
 	public void handleWindowClose() {
 		topicService.removeTopicUser(topic, user);
+	}
+
+	public void handlePrivateMessageSendPressed() {
+		if(StringUtils.isBlank(nameSendingMessageTo)){
+			JOptionPane.showMessageDialog(frame,
+					"Please select a user to send a message to");
+			
+			return;
+		}
+		
+		String messageToSend = getMessageToSend();
+		
+		if(StringUtils.isNotBlank(messageToSend)){
+			handleSubmitPressed(messageToSend);
+		} else {
+			JOptionPane.showMessageDialog(frame,
+					"Message input blank.  No message sent.");
+		}
+		
+	}
+	
+	public void highlightAllPMs() {
+		ColoredTable messagesTable = frame.getMessagesTable();
+		
+		for(Integer i : rowsToHighlight){
+			messagesTable.setRowColor(i, Color.RED);
+		}
+		
+	}
+	
+	private String getMessageToSend() {
+		JPanel messageSendPanel = new JPanel();
+		JTextField tfMessage = new JTextField(20);
+
+		messageSendPanel.add(tfMessage);
+
+		String[] options = new String[] { "Submit" };
+
+		JOptionPane.showOptionDialog(null, messageSendPanel, "Message to send", JOptionPane.NO_OPTION,
+				JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+
+		return new String(tfMessage.getText());
 	}
 }

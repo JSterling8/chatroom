@@ -15,9 +15,6 @@ import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionException;
-import net.jini.core.transaction.TransactionFactory;
-import net.jini.core.transaction.server.TransactionManager;
-import net.jini.core.transaction.Transaction.Created;
 import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
 import services.helper.TransactionHelper;
@@ -27,7 +24,7 @@ public class TopicService {
 
 	private JavaSpace05 space = SpaceService.getSpace();
 	private EntryLookupHelper lookupHelper = new EntryLookupHelper();
-	
+
 	private TopicService() {
 	}
 
@@ -44,15 +41,16 @@ public class TopicService {
 
 		try {
 			transaction = TransactionHelper.getTransaction(3000);
-			
+
 			if (isValidTopic(topic) && !topicExistsInSpace(topic, transaction)) {
 				space.write(topic, transaction, Lease.FOREVER);
 				transaction.commit();
 			} else {
-				throw new DuplicateEntryException("Failed to create topic.  Topic baseName or id matches with an existing topic.");
+				throw new DuplicateEntryException(
+						"Failed to create topic.  Topic baseName or id matches with an existing topic.");
 			}
 
-		} catch (Exception e) {			
+		} catch (Exception e) {
 			if (transaction != null) {
 				try {
 					transaction.abort();
@@ -97,45 +95,72 @@ public class TopicService {
 			e.printStackTrace();
 		}
 
-
 		return topic;
 	}
 
-	public void deleteTopic(JMSTopic topic) {
-		try{
-			space.takeIfExists(topic, null, 3000);
-			
-			deleteAllTopicUsers(topic);
-			MessageService.getMessageService().deleteAllTopicMessages(topic);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-	}
-	
-	public List<JMSTopicUser> getAllTopicUsers(JMSTopic topic){
-		return lookupHelper.findAllMatchingTemplate(space, new JMSTopicUser(topic));
-	}
-	
-	private void deleteAllTopicUsers(JMSTopic topic) {
-		JMSTopicUser template = new JMSTopicUser(topic);
-		
+	/**
+	 * This method is for checking if an EXACT topic passed in matches one
+	 * existing in the space.
+	 * 
+	 * This method should not be used to see if a topic with the same name
+	 * exists.
+	 * 
+	 * @param topic
+	 *            The topic to check for existence of
+	 * 
+	 * @return Whether or not a topic exists in the space with all fields the
+	 *         same as specified in the paramater passed in. Also returns false
+	 *         if exception occurs
+	 */
+	public boolean doesTopicExistInSpace(JMSTopic topic, Transaction transaction) {
 		try {
-			while(space.readIfExists(template, null, 1000) != null){
-				space.takeIfExists(template, null, 1000);
+			if (space.readIfExists(topic, transaction, 500) != null) {
+				return true;
+			} else {
+				return false;
 			}
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
-			System.err.println("Failed to delete all users from Topic entitled: '" + 
-								topic.getName() +"' with ID: '" + topic.getId().toString() + "'");
+			System.err.println("Failed to get topic from space");
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public void deleteTopic(JMSTopic topic) {
+		try {
+			space.takeIfExists(topic, null, 3000);
+
+			deleteAllTopicUsers(topic);
+			MessageService.getMessageService().deleteAllTopicMessages(topic);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void addTopicUser(JMSTopic topic, JMSUser user){
+	public List<JMSTopicUser> getAllTopicUsers(JMSTopic topic) {
+		return lookupHelper.findAllMatchingTemplate(space, new JMSTopicUser(topic));
+	}
+
+	private void deleteAllTopicUsers(JMSTopic topic) {
+		JMSTopicUser template = new JMSTopicUser(topic);
+
+		try {
+			while (space.readIfExists(template, null, 1000) != null) {
+				space.takeIfExists(template, null, 1000);
+			}
+		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
+			System.err.println("Failed to delete all users from Topic entitled: '" + topic.getName() + "' with ID: '"
+					+ topic.getId().toString() + "'");
+			e.printStackTrace();
+		}
+	}
+
+	public void addTopicUser(JMSTopic topic, JMSUser user) {
 		JMSTopicUser topicUser = new JMSTopicUser(topic, user);
-		
+
 		try {
 			// Only create if the user isn't already in there...
-			if(space.readIfExists(topicUser, null, 1000) == null){
+			if (space.readIfExists(topicUser, null, 1000) == null) {
 				space.write(topicUser, null, Lease.FOREVER);
 			}
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
@@ -164,33 +189,32 @@ public class TopicService {
 		return false;
 	}
 
-	public void removeTopicUser(JMSTopic topic, JMSUser user){
+	public void removeTopicUser(JMSTopic topic, JMSUser user) {
 		try {
 			boolean removed = false;
 			JMSTopicUser template = new JMSTopicUser(topic, user);
-			
-			while(space.takeIfExists(template, null, 1000) != null) {
+
+			while (space.takeIfExists(template, null, 1000) != null) {
 				removed = true;
 			}
-			
-			
-			if(removed) {
+
+			if (removed) {
 				JMSTopicUserRemoved removedObject = new JMSTopicUserRemoved(template);
-				
-				if(space.readIfExists(removedObject, null, 1000) == null){
-					// This is so a later notification can pick this up and remove the user from an open topic user list.
+
+				if (space.readIfExists(removedObject, null, 1000) == null) {
+					// This is so a later notification can pick this up and
+					// remove the user from an open topic user list.
 					space.write(new JMSTopicUserRemoved(template), null, 1000);
 				}
 
 			}
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
-			System.err.println("Failed to remove user from topic.  "
-					+ "User ID: '" + user.getId().toString() 
+			System.err.println("Failed to remove user from topic.  " + "User ID: '" + user.getId().toString()
 					+ "' && Topic ID: '" + topic.getId().toString() + "'");
 			e.printStackTrace();
 		}
 	}
-	
+
 	private boolean isValidTopic(JMSTopic topic) {
 		if (StringUtils.isNotBlank(topic.getBaseName()) && StringUtils.isNotBlank(topic.getName())
 				&& topic.getUsers() >= 1 && topic.getId() != null) {

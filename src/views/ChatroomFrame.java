@@ -21,125 +21,151 @@ import javax.swing.table.DefaultTableModel;
 import controllers.ChatroomController;
 import models.JMSTopic;
 import models.JMSUser;
+import java.awt.Component;
+import java.awt.Font;
 
 public class ChatroomFrame extends JFrame {
 	private DefaultTableModel messagesTableModel;
 	private DefaultTableModel usersTableModel;
 	private ChatroomController controller;
 	private JTextField tfMessageInput;
-	private JTable messagesTable;
-	
+	private ColoredTable messagesTable;
+	private String nameSelected;
+	private JTable usersTable;
+
 	public ChatroomFrame(JMSTopic topic, JMSUser user) {
-		//TODO Set default column widths so timestamp and name are smaller than message block.
+		// TODO Set default column widths so timestamp and name are smaller than
+		// message block.
 		this.controller = new ChatroomController(this, topic, user);
-		
+
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		JPanel panel = new JPanel();
 		getContentPane().add(panel);
 		panel.setLayout(null);
-		
+
 		messagesTableModel = controller.generateMessagesTableModel();
 
-		messagesTable = new JTable(messagesTableModel);
+		messagesTable = new ColoredTable(messagesTableModel);
 		messagesTable.removeColumn(messagesTable.getColumnModel().getColumn(3));
 		messagesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		// Makes cells non editable.
-		for(int i = 0; i <messagesTable.getColumnCount(); i++){
+		for (int i = 0; i < messagesTable.getColumnCount(); i++) {
 			Class<?> columnClass = messagesTable.getColumnClass(i);
 			messagesTable.setDefaultEditor(columnClass, null);
 		}
 		messagesTable.getSelectionModel().addListSelectionListener(new SharedMessageListSelectionHandler());
+		controller.highlightAllPMs();
 
 		JScrollPane spMessages = new JScrollPane(messagesTable);
 		spMessages.setBounds(10, 0, 620, 450);
 		panel.add(spMessages);
+
+		JPanel usersPanel = new JPanel();
+		usersPanel.setBounds(642, 0, 178, 450);
+		panel.add(usersPanel);
+		usersPanel.setLayout(null);
 		
+		JScrollPane scrollPane = new JScrollPane((Component) null);
+		scrollPane.setBounds(10, 13, 156, 387);
+		usersPanel.add(scrollPane);
 		
 		usersTableModel = controller.generateUsersTableModel();
-
-		JTable usersTable = new JTable(usersTableModel);
+		usersTable = new JTable(usersTableModel);
 		usersTable.removeColumn(usersTable.getColumnModel().getColumn(1));
 		usersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		usersTable.getSelectionModel().addListSelectionListener(new SharedUserListSelectionHandler());
 		
 		// Makes cells non editable.
-		for(int i = 0; i < usersTable.getColumnCount(); i++){
+		for (int i = 0; i < usersTable.getColumnCount(); i++) {
 			Class<?> columnClass = usersTable.getColumnClass(i);
 			usersTable.setDefaultEditor(columnClass, null);
 		}
-		usersTable.getSelectionModel().addListSelectionListener(new SharedUserListSelectionHandler());
 		
-		JScrollPane spUsers = new JScrollPane(usersTable);
-		spUsers.setBounds(640, 0, 182, 450);
-		panel.add(spUsers);
+		scrollPane.setColumnHeaderView(usersTable);
 		
+
+
+		
+		JButton btnSendPrivateMessage = new JButton("Send Private Message");
+		btnSendPrivateMessage.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				controller.setNameMessageTo(nameSelected);
+				controller.handlePrivateMessageSendPressed();
+			}
+		});
+		btnSendPrivateMessage.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		btnSendPrivateMessage.setBounds(10, 413, 156, 25);
+		usersPanel.add(btnSendPrivateMessage);
+
 		tfMessageInput = new JTextField();
 		tfMessageInput.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent arg0) {
-				if(arg0.getKeyCode() == KeyEvent.VK_ENTER){
-					controller.handleSubmitPressed();
+				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+					controller.handleSubmitPressed(null);
 				}
 			}
 		});
 		tfMessageInput.setBounds(10, 461, 692, 31);
 		panel.add(tfMessageInput);
 		tfMessageInput.setColumns(10);
-		
+
 		JButton btnSubmit = new JButton("Submit");
 		btnSubmit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				controller.handleSubmitPressed();
+				controller.handleSubmitPressed(null);
 			}
 		});
 		btnSubmit.setBounds(712, 461, 110, 31);
 		panel.add(btnSubmit);
-		
+
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(new Dimension(850, 550));
-		setVisible(true);		
+		setVisible(true);
 	}
-	
-	public JTable getMessagesTable(){
+
+	public ColoredTable getMessagesTable() {
 		return messagesTable;
 	}
-	
+
 	public JTextField getTfMessageInput() {
 		return tfMessageInput;
 	}
-	
-    @Override
-    public void dispose(){
-    	super.dispose();
-    	
-    	controller.handleWindowClose();
-    }
-	
-    private class SharedUserListSelectionHandler implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent e) { 
-            ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-            // TODO Implement private messaging on user selection...
 
-            if (!lsm.isSelectionEmpty()) {
-                int selectedRowIndex = lsm.getMinSelectionIndex();
-            } else {
-            }
+	@Override
+	public void dispose() {
+		super.dispose();
 
-        }
-    }
-    
-    private class SharedMessageListSelectionHandler implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent e) { 
-            ListSelectionModel lsm = (ListSelectionModel)e.getSource();
- 
-            // TODO Implement private messaging on message selection...
+		controller.handleWindowClose();
+	}
 
-            if (!lsm.isSelectionEmpty()) {
-                int selectedRowIndex = lsm.getMinSelectionIndex();
-            } else {
-            }
+	private class SharedUserListSelectionHandler implements ListSelectionListener {
+		public void valueChanged(ListSelectionEvent e) {
+			ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+			// TODO Implement private messaging on user selection...
+			
+			if (!lsm.isSelectionEmpty()) {
+				int selectedRowIndex = lsm.getMinSelectionIndex();
+				nameSelected = (String) usersTableModel.getValueAt(selectedRowIndex, 0);
+			} else {
+			}
 
-        }
-    }
+		}
+	}
+
+	private class SharedMessageListSelectionHandler implements ListSelectionListener {
+		public void valueChanged(ListSelectionEvent e) {
+			ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+
+			// TODO Implement private messaging on message selection...
+
+			if (!lsm.isSelectionEmpty()) {
+				int selectedRowIndex = lsm.getMinSelectionIndex();
+			} else {
+			}
+		}
+	}
 }

@@ -114,13 +114,4 @@ public class LoginFrame extends JFrame {
 		setSize(new Dimension(450, 200));
 		setVisible(true);
 	}
-
-	public static void main(String[] args) throws InterruptedException {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				new LoginFrame();
-			}
-		});
-	}
-
 }

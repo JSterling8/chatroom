@@ -111,4 +111,12 @@ public class UserService {
 	public JMSUser getUserByBaseName(String baseName){
 		return getUserByBaseName(baseName, null);
 	}
+	
+	public String getBaseNameFromName(String name){
+		String baseName = name;
+		baseName = baseName.replaceAll("[^A-Za-z0-9]", "");
+		baseName = baseName.toUpperCase();
+		
+		return baseName;
+	}
 }
