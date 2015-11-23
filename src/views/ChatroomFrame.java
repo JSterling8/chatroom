@@ -55,7 +55,7 @@ public class ChatroomFrame extends JFrame {
 			messagesTable.setDefaultEditor(columnClass, null);
 		}
 		messagesTable.getSelectionModel().addListSelectionListener(new SharedMessageListSelectionHandler());
-		controller.highlightAllPMs();
+		controller.highlightAllPMsInInitialTableModel();
 
 		JScrollPane spMessages = new JScrollPane(messagesTable);
 		spMessages.setBounds(10, 0, 620, 450);

@@ -1,18 +1,17 @@
 package services.helper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.jini.core.entry.Entry;
 import net.jini.core.transaction.Transaction;
-import net.jini.core.transaction.Transaction.Created;
-import net.jini.core.transaction.TransactionFactory;
-import net.jini.core.transaction.server.TransactionManager;
 import net.jini.space.JavaSpace05;
 import net.jini.space.MatchSet;
-import services.SpaceService;
 
-public class EntryLookupHelper {
+public class EntryLookupHelper implements Serializable {
+	private static final long serialVersionUID = -6457049864685809692L;
+
 	public EntryLookupHelper() {}
 
 	@SuppressWarnings("unchecked")

@@ -1,6 +1,9 @@
 package controllers;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.io.Serializable;
+import java.rmi.MarshalledObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,22 +17,35 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang3.StringUtils;
 
+import listeners.MessageRemoteEventListener;
 import models.JMSMessage;
 import models.JMSTopic;
 import models.JMSTopicUser;
 import models.JMSUser;
+import net.jini.core.event.RemoteEvent;
+import net.jini.core.event.RemoteEventListener;
+import net.jini.core.lease.Lease;
+import net.jini.core.transaction.TransactionException;
+import net.jini.export.Exporter;
+import net.jini.jeri.BasicILFactory;
+import net.jini.jeri.BasicJeriExporter;
+import net.jini.jeri.tcp.TcpServerEndpoint;
+import net.jini.space.AvailabilityEvent;
+import net.jini.space.JavaSpace05;
 import services.MessageService;
+import services.SpaceService;
 import services.TopicService;
 import services.UserService;
 import views.ChatroomFrame;
 import views.ColoredTable;
 
-public class ChatroomController {
+public class ChatroomController implements Serializable, RemoteEventListener {
 	// FIXME Word wrap message cells.
 	// FIXME Private messages that are seen by sender, recipient, and topic owner
 	// FIXME Notifications for messages and private messages
 	// TODO Spam prevention
 	// TODO Topic deleted notification?
+	private static final long serialVersionUID = 523026449422229593L;
 	private static final UserService userService = UserService.getUserService();
 	private ChatroomFrame frame;
 	private DefaultTableModel messagesTableModel;
@@ -40,8 +56,9 @@ public class ChatroomController {
 	private JMSUser user;
 	private String nameSendingMessageTo;
 	private List<Integer> rowsToHighlight = new ArrayList<Integer>();
+	private RemoteEventListener theStub;
 	
-	public ChatroomController(ChatroomFrame frame, JMSTopic topic, JMSUser user){
+	public ChatroomController(ChatroomFrame frame, JMSTopic topic, JMSUser user) {
 		this.frame = frame;
 		this.topic = topic;
 		this.user = user;
@@ -50,6 +67,7 @@ public class ChatroomController {
 		this.topicService = TopicService.getTopicService();
 		
 		markUserAsInTopic();
+		listenForNewMessages();
 	}
 	
 	public DefaultTableModel generateMessagesTableModel() {
@@ -140,25 +158,25 @@ public class ChatroomController {
 			}
 			
 			if(successfullyAddedToSpace){
-				Object[] rowData = {new Date(System.currentTimeMillis()).toString(), user.getName(), text};
-				messagesTableModel.addRow(rowData);
+/*				Object[] rowData = {new Date(System.currentTimeMillis()).toString(), user.getName(), text};
+				messagesTableModel.addRow(rowData);*/
 			
 				scrollToBottomOfMessages();
 				tfMessageInput.setText(null);
 				
-				if(isPrivateMessage){
+/*				if(isPrivateMessage){
 					colourBottomMessageRed();
-				}
+				}*/
 			} else {
 				JOptionPane.showMessageDialog(frame, "Failed to send message to server.  Perhaps the owner has deleted the topic?");
 			}
 		}
 	}
 
-	private void colourBottomMessageRed() {
+	public void colourBottomMessage() {
 		ColoredTable messagesTable = frame.getMessagesTable();
 		int lastRow = messagesTable.getRowCount() - 1;
-		messagesTable.setRowColor(lastRow, Color.RED);
+		messagesTable.setRowColor(lastRow, Color.LIGHT_GRAY);
 	}
 
 	private void scrollToBottomOfMessages() {
@@ -193,13 +211,70 @@ public class ChatroomController {
 		
 	}
 	
-	public void highlightAllPMs() {
+	public void highlightAllPMsInInitialTableModel() {
 		ColoredTable messagesTable = frame.getMessagesTable();
 		
 		for(Integer i : rowsToHighlight){
-			messagesTable.setRowColor(i, Color.RED);
-		}
+			messagesTable.setRowColor(i, Color.LIGHT_GRAY);
+		}	
+	}
+	
+	public void listenForNewMessages() {
+		JavaSpace05 space = SpaceService.getSpace();
+		JMSMessage template = new JMSMessage(topic);
+		ArrayList<JMSMessage> templates = new ArrayList<JMSMessage>(1);
+		templates.add(template);
 		
+		try {
+			// create the exporter
+			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
+								false, true);
+		
+			// register this as a remote object
+			// and get a reference to the 'stub'
+			MessageRemoteEventListener eventListener = new MessageRemoteEventListener(this, topic, user);
+			theStub = (RemoteEventListener) myDefaultExporter.export(this);
+				
+			space.registerForAvailabilityEvent(templates, 
+					null, 
+					true, 
+					theStub, 
+					Lease.FOREVER, // Should maybe not be forever?
+					new MarshalledObject("Not used"));
+		} catch (TransactionException | IOException e) {
+			System.err.println("Failed to get new message(s)");
+			e.printStackTrace();
+		}
+	}
+	
+	public void notify(RemoteEvent event) {
+		try {
+			AvailabilityEvent availEvent = (AvailabilityEvent) event;
+			JMSMessage message = (JMSMessage) availEvent.getEntry();
+			
+			if 	(		
+					message.getTo() == null ||
+					message.getTo().getId().equals(user.getId()) || 
+					message.getFrom().getId().equals(user.getId()) ||
+					topic.getOwner().getId().equals(user.getId())
+				) {
+				JMSUser userFrom = message.getFrom();
+				String messageText = message.getMessage();
+				Date sentDate = message.getSentDate();
+				Object[] rowData = { sentDate.toString(), userFrom.getName(), messageText };
+				messagesTableModel.addRow(rowData);
+				
+				// If it's a PM, mark it as such...
+				if(message.getTo() != null) {
+					colourBottomMessage();
+				}
+			} else {
+				// Not for us.  Ignore...
+			}
+		} catch (Exception e) {
+			System.err.println("Failed to run notify method in ChatroomController");
+			e.printStackTrace();
+		}
 	}
 	
 	private String getMessageToSend() {

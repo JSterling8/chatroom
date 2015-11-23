@@ -1,5 +1,6 @@
 package services;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +19,8 @@ import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
 import services.helper.TransactionHelper;
 
-public class MessageService {
+public class MessageService implements Serializable {
+	private static final long serialVersionUID = -362012410946846034L;
 	private static final TopicService topicService = TopicService.getTopicService();
 	private static MessageService messageService;
 

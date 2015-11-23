@@ -1,5 +1,6 @@
 package services;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +20,9 @@ import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
 import services.helper.TransactionHelper;
 
-public class TopicService {
+public class TopicService implements Serializable {
+	private static final long serialVersionUID = 4384471014207319215L;
+
 	private static TopicService topicService;
 
 	private JavaSpace05 space = SpaceService.getSpace();
