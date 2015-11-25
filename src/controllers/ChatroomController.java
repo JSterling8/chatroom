@@ -67,7 +67,7 @@ public class ChatroomController implements Serializable {
 		this.topicService = TopicService.getTopicService();
 		
 		markUserAsInTopic();
-		listenForNewMessages();
+		registerMessageListener();
 	}
 	
 	public DefaultTableModel generateMessagesTableModel() {
@@ -219,7 +219,7 @@ public class ChatroomController implements Serializable {
 		}	
 	}
 	
-	public void listenForNewMessages() {
+	public void registerMessageListener() {
 		JavaSpace05 space = SpaceService.getSpace();
 		JMSMessage template = new JMSMessage(topic);
 		ArrayList<JMSMessage> templates = new ArrayList<JMSMessage>(1);
