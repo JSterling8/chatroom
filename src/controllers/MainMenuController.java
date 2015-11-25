@@ -31,7 +31,6 @@ import views.LoginFrame;
 import views.MainMenuFrame;
 
 public class MainMenuController {
-	// FIXME -- Adding topics breaks table :(
 	private static TopicService topicService = TopicService.getTopicService();
 
 	private MainMenuFrame frame;
