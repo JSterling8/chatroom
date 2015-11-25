@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang3.StringUtils;
 
-import listeners.MessageRemoteEventListener;
 import listeners.TopicRemoteEventListener;
 import models.JMSTopic;
 import models.JMSUser;
@@ -152,5 +152,12 @@ public class MainMenuController {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(frame, "Failed to create topic.  Topic name already exists");
 		}
+	}
+
+	public void updateTopicList(JTable table) {
+		tableModel = generateTopicTableModel();
+		table.setModel(tableModel);
+		table.removeColumn(table.getColumnModel().getColumn(MainMenuFrame.COLUMN_INDEX_OF_TOPIC_OWNER_ID));
+		table.removeColumn(table.getColumnModel().getColumn(MainMenuFrame.COLUMN_INDEX_OF_TOPIC_ID - 1));  // -1 is because index 4 becomes index 3 after the column in the line above is removed
 	}
 }

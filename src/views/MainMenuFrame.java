@@ -31,9 +31,10 @@ import models.JMSUser;
 import java.awt.event.ActionListener;
 
 public class MainMenuFrame extends JFrame {
+	public static final int COLUMN_INDEX_OF_TOPIC_ID = 4;
+	public static final int COLUMN_INDEX_OF_TOPIC_OWNER_ID = 3;
+	
 	private static final long serialVersionUID = -1262155724457779827L;
-	private static final int COLUMN_INDEX_OF_TOPIC_ID = 4;
-	private static final int COLUMN_INDEX_OF_TOPIC_OWNER_ID = 3;
 	
 	private MainMenuController controller;
 	private DefaultTableModel tableModel;
@@ -51,9 +52,11 @@ public class MainMenuFrame extends JFrame {
 		getContentPane().add(panel);
 		panel.setLayout(null);
 
+		tableModel = controller.generateTopicTableModel();
 		JTable table = new JTable(tableModel);
-		updateTopicList(table);
+		controller.updateTopicList(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 		// Makes cells non editable.
 		for(int i = 0; i <table.getColumnCount(); i++){
 			Class<?> columnClass = table.getColumnClass(i);
@@ -72,16 +75,6 @@ public class MainMenuFrame extends JFrame {
 			}
 		});
 		createKeyBindings(table);
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(10000);
-					updateTopicList(table);
-				} catch (Exception e) {
-					System.err.println("Failed to update topic list.  Might be unrecoverable.  Topic list may no longer refresh/update.");
-				}
-			}
-		}).start();
 
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(0, 0, 630, 503);
@@ -142,7 +135,7 @@ public class MainMenuFrame extends JFrame {
 		JButton btnRefreshList = new JButton("Refresh List");
 		btnRefreshList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				updateTopicList(table);
+				controller.updateTopicList(table);
 			}
 		});
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
@@ -182,13 +175,6 @@ public class MainMenuFrame extends JFrame {
 
 	public MainMenuController getController() {
 		return controller;
-	}
-	
-	private void updateTopicList(JTable table) {
-		tableModel = controller.generateTopicTableModel();
-		table.setModel(tableModel);
-		table.removeColumn(table.getColumnModel().getColumn(COLUMN_INDEX_OF_TOPIC_OWNER_ID));
-		table.removeColumn(table.getColumnModel().getColumn(COLUMN_INDEX_OF_TOPIC_ID - 1));  // -1 is because index 4 becomes index 3 after the column in the line above is removed
 	}
 	
 	private void createKeyBindings(JTable table) {
