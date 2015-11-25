@@ -2,6 +2,8 @@ package services;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,6 +53,9 @@ public class MessageService implements Serializable {
 				it.remove();
 			}
 		}
+		
+		//TODO Research if I actually need this? I don't appear to
+		Collections.sort(allMessages, new MessageComparator());
 		
 		return allMessages;
 	}
@@ -122,7 +127,12 @@ public class MessageService implements Serializable {
 			System.err.println("Failed to delete Topic Messages");
 			e.printStackTrace();
 		}
-
 	}
 
+	public class MessageComparator implements Comparator<JMSMessage> {
+	    @Override
+	    public int compare(JMSMessage o1, JMSMessage o2) {
+	        return o1.getSentDate().compareTo(o2.getSentDate());
+	    }
+	}
 }
