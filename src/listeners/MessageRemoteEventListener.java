@@ -52,7 +52,7 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 				// Not for us.  Ignore...
 			}
 		} catch (Exception e) {
-			System.err.println("Failed to run notify method in ChatroomController");
+			System.err.println("Failed to run notify method for Messages");
 			e.printStackTrace();
 		}
 	}

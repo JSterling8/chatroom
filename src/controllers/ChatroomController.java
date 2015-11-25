@@ -18,6 +18,7 @@ import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang3.StringUtils;
 
 import listeners.MessageRemoteEventListener;
+import listeners.TopicUserRemoteEventListener;
 import models.JMSMessage;
 import models.JMSTopic;
 import models.JMSTopicUser;
@@ -56,7 +57,8 @@ public class ChatroomController implements Serializable {
 	private JMSUser user;
 	private String nameSendingMessageTo;
 	private List<Integer> rowsToHighlight = new ArrayList<Integer>();
-	private RemoteEventListener theStub;
+	private RemoteEventListener theMessagesStub;
+	private RemoteEventListener theUsersStub;
 	
 	public ChatroomController(ChatroomFrame frame, JMSTopic topic, JMSUser user) {
 		this.frame = frame;
@@ -68,8 +70,9 @@ public class ChatroomController implements Serializable {
 		
 		markUserAsInTopic();
 		registerMessageListener();
+		registerUserListener();
 	}
-	
+
 	public DefaultTableModel generateMessagesTableModel() {
 		Object[] columns = { "Date/Time", "User", "Message", "Message ID" };
 		List<JMSMessage> messages = messageService.getAllMessagesForUserInTopic(topic, user);
@@ -233,16 +236,44 @@ public class ChatroomController implements Serializable {
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			MessageRemoteEventListener eventListener = new MessageRemoteEventListener(this, topic, user);
-			theStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+			theMessagesStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 				
 			space.registerForAvailabilityEvent(templates, 
 					null, 
 					true, 
-					theStub, 
+					theMessagesStub, 
 					Lease.FOREVER, // Should maybe not be forever?
 					null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new message(s)");
+			e.printStackTrace();
+		}
+	}
+	
+	private void registerUserListener() {
+		JavaSpace05 space = SpaceService.getSpace();
+		JMSTopicUser template = new JMSTopicUser(topic);
+		ArrayList<JMSTopicUser> templates = new ArrayList<JMSTopicUser>(1);
+		templates.add(template);
+		
+		try {
+			// create the exporter
+			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
+								false, true);
+		
+			// register this as a remote object
+			// and get a reference to the 'stub'
+			TopicUserRemoteEventListener eventListener = new TopicUserRemoteEventListener(this);
+			theUsersStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+				
+			space.registerForAvailabilityEvent(templates, 
+					null, 
+					true, 
+					theUsersStub, 
+					Lease.FOREVER, // Should maybe not be forever?
+					null);
+		} catch (TransactionException | IOException e) {
+			System.err.println("Failed to get new user(s)");
 			e.printStackTrace();
 		}
 	}
@@ -263,5 +294,9 @@ public class ChatroomController implements Serializable {
 
 	public DefaultTableModel getMessagesTableModel() {
 		return messagesTableModel;
+	}
+	
+	public DefaultTableModel getUsersTableModel() {
+		return usersTableModel;
 	}
 }

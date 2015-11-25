@@ -1,6 +1,8 @@
 package controllers;
 
 import java.awt.Frame;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,8 +12,19 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang3.StringUtils;
 
+import listeners.MessageRemoteEventListener;
+import listeners.TopicRemoteEventListener;
 import models.JMSTopic;
 import models.JMSUser;
+import net.jini.core.event.RemoteEventListener;
+import net.jini.core.lease.Lease;
+import net.jini.core.transaction.TransactionException;
+import net.jini.export.Exporter;
+import net.jini.jeri.BasicILFactory;
+import net.jini.jeri.BasicJeriExporter;
+import net.jini.jeri.tcp.TcpServerEndpoint;
+import net.jini.space.JavaSpace05;
+import services.SpaceService;
 import services.TopicService;
 import views.ChatroomFrame;
 import views.LoginFrame;
@@ -24,10 +37,42 @@ public class MainMenuController {
 	private MainMenuFrame frame;
 	private DefaultTableModel tableModel;
 	private JMSUser user;
+	private RemoteEventListener theStub;
 
 	public MainMenuController(MainMenuFrame frame, JMSUser user) {
 		this.frame = frame;
 		this.user = user;
+		
+		registerTopicListener();
+	}
+
+	private void registerTopicListener() {
+		JavaSpace05 space = SpaceService.getSpace();
+		JMSTopic template = new JMSTopic();
+		ArrayList<JMSTopic> templates = new ArrayList<JMSTopic>(1);
+		templates.add(template);
+		
+		try {
+			// create the exporter
+			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
+								false, true);
+		
+			// register this as a remote object
+			// and get a reference to the 'stub'
+			TopicRemoteEventListener eventListener = new TopicRemoteEventListener(this);
+			theStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+				
+			space.registerForAvailabilityEvent(templates, 
+					null, 
+					true, 
+					theStub, 
+					Lease.FOREVER, // Should maybe not be forever?
+					null);
+		} catch (TransactionException | IOException e) {
+			System.err.println("Failed to get new topic(s)");
+			e.printStackTrace();
+		}
+		
 	}
 
 	public void handleCreateButtonPressed() {
@@ -54,6 +99,10 @@ public class MainMenuController {
 			JOptionPane.showInternalMessageDialog(frame, "Failed to delete topic.  " + "You are not the topic owner",
 					"Topic Deletion Failed", JOptionPane.ERROR_MESSAGE, null);
 		}
+	}
+	
+	public DefaultTableModel getTopicTableModel() {
+		return tableModel;
 	}
 
 	public DefaultTableModel generateTopicTableModel() {
@@ -97,19 +146,10 @@ public class MainMenuController {
 
 	private void createTopic(String name) {
 		JMSTopic topic = new JMSTopic(name, user, 1);
-		boolean success = true;
 
 		try {
 			topicService.createTopic(topic);
 		} catch (Exception e) {
-			success = false;
-		}
-
-		if (success) {
-			Object[] rowData = { topic.getName(), topic.getOwner().getName(), topic.getUsers(),
-					topic.getOwner().getId(), topic.getId() };
-			tableModel.addRow(rowData);
-		} else {
 			JOptionPane.showMessageDialog(frame, "Failed to create topic.  Topic name already exists");
 		}
 	}
