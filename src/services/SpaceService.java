@@ -14,7 +14,7 @@ import net.jini.space.JavaSpace05;
  * This is Dr. Gary Allen's SpaceUtils class, which I've renamed and made a few
  * tweaks to.
  * 
- * @author Gary Allen
+ * @author Gary Allen 
  *
  */
 public class SpaceService {
