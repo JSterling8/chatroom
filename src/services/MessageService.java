@@ -48,8 +48,7 @@ public class MessageService implements Serializable {
 		while(it.hasNext()){
 			JMSMessage message = (JMSMessage) it.next();
 			if(message.getTo() != null && 
-					message.getTo().getId() != user.getId() &&
-					!user.getId().equals(topic.getOwner().getId())){
+					message.getTo().getId() != user.getId()){
 				it.remove();
 			}
 		}

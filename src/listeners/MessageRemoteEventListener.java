@@ -35,8 +35,7 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 			if 	(		
 					message.getTo() == null ||
 					message.getTo().getId().equals(user.getId()) || 
-					message.getFrom().getId().equals(user.getId()) ||
-					topic.getOwner().getId().equals(user.getId())
+					message.getFrom().getId().equals(user.getId())
 				) {
 				JMSUser userFrom = message.getFrom();
 				String messageText = message.getMessage();
