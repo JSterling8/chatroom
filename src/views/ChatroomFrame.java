@@ -36,6 +36,7 @@ public class ChatroomFrame extends JFrame {
 	public ChatroomFrame(JMSTopic topic, JMSUser user) {
 		// TODO Set default column widths so timestamp and name are smaller than
 		// message block.
+		// TODO Create a "Message Owner" button.
 		this.controller = new ChatroomController(this, topic, user);
 
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
