@@ -1,7 +1,6 @@
 package listeners;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.Date;
 
 import controllers.ChatroomController;
@@ -10,7 +9,6 @@ import models.JMSTopic;
 import models.JMSUser;
 import net.jini.core.event.RemoteEvent;
 import net.jini.core.event.RemoteEventListener;
-import net.jini.core.event.UnknownEventException;
 import net.jini.space.AvailabilityEvent;
 
 public class MessageRemoteEventListener implements RemoteEventListener, Serializable {
@@ -32,7 +30,8 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 			AvailabilityEvent availEvent = (AvailabilityEvent) event;
 			JMSMessage message = (JMSMessage) availEvent.getEntry();
 			
-			if 	(		
+			if 	(	
+					message.getTopic().getId().equals(topic.getId()) ||	
 					message.getTo() == null ||
 					message.getTo().getId().equals(user.getId()) || 
 					message.getFrom().getId().equals(user.getId())
