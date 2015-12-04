@@ -29,7 +29,7 @@ public class TopicUserRemovedRemoteEventListener implements RemoteEventListener 
 			
 			for(int i = 0; i < usersTableModel.getRowCount(); i++){
 				UUID idOfUserInTable = (UUID) usersTableModel.getValueAt(i, 1);
-				if (idOfUserInTable.equals(topicUserRemoved.getTopicUser().getUser().getId())){
+				if (idOfUserInTable.equals(topicUserRemoved.getUser().getId())){
 					usersTableModel.removeRow(i);
 					
 					break;

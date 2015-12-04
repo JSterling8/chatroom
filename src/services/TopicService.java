@@ -202,14 +202,9 @@ public class TopicService implements Serializable {
 			}
 
 			if (removed) {
-				JMSTopicUserRemoved removedObject = new JMSTopicUserRemoved(template);
+				JMSTopicUserRemoved removedTopicUser = new JMSTopicUserRemoved(template.getTopic(), template.getUser());
 
-				if (space.readIfExists(removedObject, null, 1000) == null) {
-					// This is so a later notification can pick this up and
-					// remove the user from an open topic user list.
-					space.write(new JMSTopicUserRemoved(template), null, 1000);
-				}
-
+				space.write(removedTopicUser, null, 1000l * 60l);
 			}
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
 			System.err.println("Failed to remove user from topic.  " + "User ID: '" + user.getId().toString()

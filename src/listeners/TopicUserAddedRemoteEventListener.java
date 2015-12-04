@@ -12,12 +12,12 @@ import net.jini.core.event.RemoteEvent;
 import net.jini.core.event.RemoteEventListener;
 import net.jini.space.AvailabilityEvent;
 
-public class TopicUserRemoteEventListener implements RemoteEventListener, Serializable {
+public class TopicUserAddedRemoteEventListener implements RemoteEventListener, Serializable {
 	private static final long serialVersionUID = 2510981009015708368L;
 	
 	private final ChatroomController controller;
 	
-	public TopicUserRemoteEventListener(ChatroomController controller){
+	public TopicUserAddedRemoteEventListener(ChatroomController controller){
 		super();
 		
 		this.controller = controller;

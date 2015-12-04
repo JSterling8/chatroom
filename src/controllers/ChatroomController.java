@@ -17,10 +17,12 @@ import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang3.StringUtils;
 
 import listeners.MessageRemoteEventListener;
-import listeners.TopicUserRemoteEventListener;
+import listeners.TopicUserAddedRemoteEventListener;
+import listeners.TopicUserRemovedRemoteEventListener;
 import models.JMSMessage;
 import models.JMSTopic;
 import models.JMSTopicUser;
+import models.JMSTopicUserRemoved;
 import models.JMSUser;
 import net.jini.core.event.RemoteEventListener;
 import net.jini.core.lease.Lease;
@@ -53,7 +55,8 @@ public class ChatroomController implements Serializable {
 	private String nameSendingMessageTo;
 	private List<Integer> rowsToHighlight = new ArrayList<Integer>();
 	private RemoteEventListener theMessagesStub;
-	private RemoteEventListener theUsersStub;
+	private RemoteEventListener theUsersAddedStub;
+	private RemoteEventListener theUsersRemovedStub;
 	
 	public ChatroomController(ChatroomFrame frame, JMSTopic topic, JMSUser user) {
 		this.frame = frame;
@@ -65,7 +68,8 @@ public class ChatroomController implements Serializable {
 		
 		markUserAsInTopic();
 		registerMessageListener();
-		registerUserListener();
+		registerUserAddedListener();
+		registerUserRemovedListener();
 	}
 
 	public DefaultTableModel generateMessagesTableModel() {
@@ -242,7 +246,7 @@ public class ChatroomController implements Serializable {
 		}
 	}
 	
-	private void registerUserListener() {
+	private void registerUserAddedListener() {
 		JavaSpace05 space = SpaceService.getSpace();
 		JMSTopicUser template = new JMSTopicUser(topic);
 		ArrayList<JMSTopicUser> templates = new ArrayList<JMSTopicUser>(1);
@@ -255,17 +259,45 @@ public class ChatroomController implements Serializable {
 		
 			// register this as a remote object
 			// and get a reference to the 'stub'
-			TopicUserRemoteEventListener eventListener = new TopicUserRemoteEventListener(this);
-			theUsersStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+			TopicUserAddedRemoteEventListener eventListener = new TopicUserAddedRemoteEventListener(this);
+			theUsersAddedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 				
 			space.registerForAvailabilityEvent(templates, 
 					null, 
 					true, 
-					theUsersStub, 
+					theUsersAddedStub, 
 					Lease.FOREVER, // Should maybe not be forever?
 					null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new user(s)");
+			e.printStackTrace();
+		}
+	}
+	
+	private void registerUserRemovedListener() {
+		JavaSpace05 space = SpaceService.getSpace();
+		JMSTopicUserRemoved template = new JMSTopicUserRemoved(topic);
+		ArrayList<JMSTopicUserRemoved> templates = new ArrayList<JMSTopicUserRemoved>(1);
+		templates.add(template);
+		
+		try {
+			// create the exporter
+			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
+								false, true);
+		
+			// register this as a remote object
+			// and get a reference to the 'stub'
+			TopicUserRemovedRemoteEventListener eventListener = new TopicUserRemovedRemoteEventListener(this);
+			theUsersRemovedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+				
+			space.registerForAvailabilityEvent(templates, 
+					null, 
+					true, 
+					theUsersRemovedStub, 
+					Lease.FOREVER, // Should maybe not be forever?
+					null);
+		} catch (TransactionException | IOException e) {
+			System.err.println("Failed to remove user(s)");
 			e.printStackTrace();
 		}
 	}
