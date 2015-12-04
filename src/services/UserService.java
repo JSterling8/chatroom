@@ -14,7 +14,7 @@ import net.jini.space.JavaSpace05;
 import services.helper.TransactionHelper;
 
 public class UserService {
-	private static final long THIRTY_DAYS_IN_MILLIS = 1000l * 60l * 60l * 24l * 30l;
+	private static final long NINETY_DAYS_IN_MILLIS = 1000l * 60l * 60l * 24l * 90l;
 
 	private static final JavaSpace05 space = SpaceService.getSpace();
 	
@@ -44,7 +44,7 @@ public class UserService {
 		Transaction transaction = TransactionHelper.getTransaction();
 		
 		if(getUserByBaseName(user.getBaseName(), transaction) == null){
-			space.write(user, transaction, THIRTY_DAYS_IN_MILLIS);
+			space.write(user, transaction, NINETY_DAYS_IN_MILLIS);
 			transaction.commit();
 		} else {
 			throw new DuplicateEntryException("User with name: '" + user.getName() + "' already exists.");
@@ -63,7 +63,7 @@ public class UserService {
 		if(userFromSpace != null){
 			try {
 				space.takeIfExists(userFromSpace, transaction, 1000);
-				space.write(user, transaction, THIRTY_DAYS_IN_MILLIS);
+				space.write(user, transaction, NINETY_DAYS_IN_MILLIS);
 				transaction.commit();
 			} catch (RemoteException | TransactionException | InterruptedException | UnusableEntryException e) {
 				System.err.println("Failed to renew user's lease");

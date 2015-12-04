@@ -107,7 +107,7 @@ public class LoginFrame extends JFrame {
 		});
 		panel_1.add(btnLogin);
 		
-		JLabel lblPleaseNoteThat = new JLabel("Please note that accounts are deleted if not logged into after 30 days");
+		JLabel lblPleaseNoteThat = new JLabel("Please note that accounts are deleted if not logged into after 90 days");
 		lblPleaseNoteThat.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblPleaseNoteThat.setForeground(Color.RED);
 		panel.add(lblPleaseNoteThat);
