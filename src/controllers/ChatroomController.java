@@ -56,15 +56,15 @@ public class ChatroomController implements Serializable {
 	private RemoteEventListener theMessagesStub;
 	private RemoteEventListener theUsersAddedStub;
 	private RemoteEventListener theUsersRemovedStub;
-	
+
 	public ChatroomController(ChatroomFrame frame, JMSTopic topic, JMSUser user) {
 		this.frame = frame;
 		this.topic = topic;
 		this.user = user;
-				
+
 		this.messageService = MessageService.getMessageService();
 		this.topicService = TopicService.getTopicService();
-		
+
 		markUserAsInTopic();
 		registerMessageListener();
 		registerUserAddedListener();
@@ -74,23 +74,23 @@ public class ChatroomController implements Serializable {
 	public DefaultTableModel generateMessagesTableModel() {
 		Object[] columns = { "Time Sent", "User", "Message", "Message ID" };
 		List<JMSMessage> messages = messageService.getAllMessagesForUserInTopic(topic, user);
-		
-		for(int i = 0; i < messages.size(); i++) {
+
+		for (int i = 0; i < messages.size(); i++) {
 			JMSMessage message = messages.get(i);
-			
-			if(message.getTo() != null && StringUtils.isNotBlank(message.getTo().getName())){
+
+			if (message.getTo() != null && StringUtils.isNotBlank(message.getTo().getName())) {
 				rowsToHighlight.add(i);
 			}
 		}
-		
+
 		Object[][] data = {};
-		
-		if(messages != null && messages.size() > 0){
+
+		if (messages != null && messages.size() > 0) {
 			data = new Object[messages.size()][4];
-			for(int i = 0; i < messages.size(); i++){
+			for (int i = 0; i < messages.size(); i++) {
 				@SuppressWarnings("deprecation")
 				String minutes = "" + messages.get(i).getSentDate().getMinutes();
-				if(minutes.length() == 1){
+				if (minutes.length() == 1) {
 					minutes = "0" + minutes;
 				}
 				@SuppressWarnings("deprecation")
@@ -103,70 +103,73 @@ public class ChatroomController implements Serializable {
 		}
 
 		messagesTableModel = new DefaultTableModel(data, columns);
-		
+
 		return messagesTableModel;
 	}
-	
+
 	public DefaultTableModel generateUsersTableModel() {
 		Object[] columns = { "Users", "User ID" };
 		List<JMSTopicUser> users = topicService.getAllTopicUsers(topic);
 
 		Object[][] data = {};
-		
-		if(users != null && users.size() > 0){
+
+		if (users != null && users.size() > 0) {
 			data = new Object[users.size()][2];
-			for(int i = 0; i < users.size(); i++){
+			for (int i = 0; i < users.size(); i++) {
 				data[i][0] = users.get(i).getUser().getName();
 				data[i][1] = users.get(i).getUser().getId();
 			}
 		}
-		
+
 		usersTableModel = new DefaultTableModel(data, columns);
 
 		return usersTableModel;
 	}
-	
-	public void setNameMessageTo(String name){
+
+	public void setNameMessageTo(String name) {
 		this.nameSendingMessageTo = name;
 	}
 
 	public void handleSubmitPressed(String text) {
 		JTextField tfMessageInput = frame.getTfMessageInput();
-		
+
 		// If text is not blank, it's a private message.
-		if(StringUtils.isBlank(text)){
+		if (StringUtils.isBlank(text)) {
 			text = tfMessageInput.getText();
 		}
-		
-		if(StringUtils.isNotBlank(text)){
+
+		if (StringUtils.isNotBlank(text)) {
 			boolean successfullyAddedToSpace = false;
 			try {
-				if(StringUtils.isBlank(nameSendingMessageTo)){
-					messageService.createMessage(new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), text));
+				if (StringUtils.isBlank(nameSendingMessageTo)) {
+					messageService
+							.createMessage(new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), text));
 					successfullyAddedToSpace = true;
 				} else {
 					String baseName = userService.getBaseNameFromName(nameSendingMessageTo);
 					JMSUser userTo = userService.getUserByBaseName(baseName);
-					text = "PM TO '" + userTo.getName() + "': "+ text;
-					
-					messageService.createMessage(new JMSMessage(topic, new Date(), user, userTo, UUID.randomUUID(), text));
+					text = "PM TO '" + userTo.getName() + "': " + text;
+
+					messageService
+							.createMessage(new JMSMessage(topic, new Date(), user, userTo, UUID.randomUUID(), text));
 					successfullyAddedToSpace = true;
-					
+
 					// Reset this variable
 					nameSendingMessageTo = null;
 				}
 			} catch (Exception e) {
 				System.err.println("Failed to create public message in topic.");
 				e.printStackTrace();
-				
+
 				nameSendingMessageTo = null;
 			}
-			
-			if(successfullyAddedToSpace){
+
+			if (successfullyAddedToSpace) {
 				scrollToBottomOfMessages();
 				tfMessageInput.setText(null);
 			} else {
-				JOptionPane.showMessageDialog(frame, "Failed to send message to server.  Perhaps the owner has deleted the topic?");
+				JOptionPane.showMessageDialog(frame,
+						"Failed to send message to server.  Perhaps the owner has deleted the topic?");
 			}
 		}
 	}
@@ -191,116 +194,114 @@ public class ChatroomController implements Serializable {
 	}
 
 	public void handlePrivateMessageSendPressed() {
-		if(StringUtils.isBlank(nameSendingMessageTo)){
-			JOptionPane.showMessageDialog(frame,
-					"Please select a user to send a message to");
-			
+		if (StringUtils.isBlank(nameSendingMessageTo)) {
+			JOptionPane.showMessageDialog(frame, "Please select a user to send a message to");
+
 			return;
 		}
-		
+
 		String messageToSend = getMessageToSend();
-		
-		if(StringUtils.isNotBlank(messageToSend)){
+
+		if (StringUtils.isNotBlank(messageToSend)) {
 			handleSubmitPressed(messageToSend);
 		} else {
-			JOptionPane.showMessageDialog(frame,
-					"Message input blank.  No message sent.");
+			JOptionPane.showMessageDialog(frame, "Message input blank.  No message sent.");
 		}
-		
+
 	}
-	
+
 	public void highlightAllPMsInInitialTableModel() {
 		ColoredTable messagesTable = frame.getMessagesTable();
-		
-		for(Integer i : rowsToHighlight){
+
+		for (Integer i : rowsToHighlight) {
 			messagesTable.setRowColor(i, Color.LIGHT_GRAY);
-		}	
+		}
 	}
-	
+
 	public void registerMessageListener() {
 		JavaSpace05 space = SpaceService.getSpace();
 		JMSMessage template = new JMSMessage(topic);
 		ArrayList<JMSMessage> templates = new ArrayList<JMSMessage>(1);
 		templates.add(template);
-		
+
 		try {
 			// create the exporter
 			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
-								false, true);
-		
+					false, true);
+
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			MessageRemoteEventListener eventListener = new MessageRemoteEventListener(this, topic, user);
 			theMessagesStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
-				
-			space.registerForAvailabilityEvent(templates, 
-					null, 
-					true, 
-					theMessagesStub, 
-					Lease.FOREVER, // Should maybe not be forever?
+
+			space.registerForAvailabilityEvent(templates, null, true, theMessagesStub, Lease.FOREVER, // Should
+																										// maybe
+																										// not
+																										// be
+																										// forever?
 					null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new message(s)");
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void registerUserAddedListener() {
 		JavaSpace05 space = SpaceService.getSpace();
 		JMSTopicUser template = new JMSTopicUser(topic);
 		ArrayList<JMSTopicUser> templates = new ArrayList<JMSTopicUser>(1);
 		templates.add(template);
-		
+
 		try {
 			// create the exporter
 			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
-								false, true);
-		
+					false, true);
+
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			TopicUserAddedRemoteEventListener eventListener = new TopicUserAddedRemoteEventListener(this);
 			theUsersAddedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
-				
-			space.registerForAvailabilityEvent(templates, 
-					null, 
-					true, 
-					theUsersAddedStub, 
-					Lease.FOREVER, // Should maybe not be forever?
+
+			space.registerForAvailabilityEvent(templates, null, true, theUsersAddedStub, Lease.FOREVER, // Should
+																										// maybe
+																										// not
+																										// be
+																										// forever?
 					null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new user(s)");
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void registerUserRemovedListener() {
 		JavaSpace05 space = SpaceService.getSpace();
 		JMSTopicUserRemoved template = new JMSTopicUserRemoved(topic);
 		ArrayList<JMSTopicUserRemoved> templates = new ArrayList<JMSTopicUserRemoved>(1);
 		templates.add(template);
-		
+
 		try {
 			// create the exporter
 			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
-								false, true);
-		
+					false, true);
+
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			TopicUserRemovedRemoteEventListener eventListener = new TopicUserRemovedRemoteEventListener(this);
 			theUsersRemovedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
-				
-			space.registerForAvailabilityEvent(templates, 
-					null, 
-					true, 
-					theUsersRemovedStub, 
-					Lease.FOREVER, // Should maybe not be forever?
+
+			space.registerForAvailabilityEvent(templates, null, true, theUsersRemovedStub, Lease.FOREVER, // Should
+																											// maybe
+																											// not
+																											// be
+																											// forever?
 					null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to remove user(s)");
 			e.printStackTrace();
 		}
 	}
-	
+
 	private String getMessageToSend() {
 		JPanel messageSendPanel = new JPanel();
 		JTextField tfMessage = new JTextField(20);
@@ -318,8 +319,27 @@ public class ChatroomController implements Serializable {
 	public DefaultTableModel getMessagesTableModel() {
 		return messagesTableModel;
 	}
-	
+
 	public DefaultTableModel getUsersTableModel() {
 		return usersTableModel;
+	}
+
+	public void warnUserTopicDeleted() {
+		JOptionPane.showMessageDialog(frame, "This topic (" + topic.getName()
+				+ ") has been deleted by its owner.  The topic window will close in 10 seconds.");
+
+		Thread t = new Thread(new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(10000l);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					handleWindowClose();
+				}
+			}
+		});
+
+		t.start();
 	}
 }

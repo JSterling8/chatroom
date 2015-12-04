@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import exceptions.DuplicateEntryException;
 import models.JMSTopic;
+import models.JMSTopicDeleted;
 import models.JMSTopicUser;
 import models.JMSTopicUserRemoved;
 import models.JMSUser;
@@ -135,6 +136,8 @@ public class TopicService implements Serializable {
 
 			deleteAllTopicUsers(topic);
 			MessageService.getMessageService().deleteAllTopicMessages(topic);
+			
+			space.write(new JMSTopicDeleted(topic), null, 1000l * 60l);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
