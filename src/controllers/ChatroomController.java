@@ -26,6 +26,7 @@ import models.JMSTopicDeleted;
 import models.JMSTopicUser;
 import models.JMSTopicUserRemoved;
 import models.JMSUser;
+import net.jini.core.event.EventRegistration;
 import net.jini.core.event.RemoteEventListener;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.TransactionException;
@@ -59,6 +60,7 @@ public class ChatroomController implements Serializable {
 	private RemoteEventListener usersAddedStub;
 	private RemoteEventListener usersRemovedStub;
 	private RemoteEventListener topicRemovedStub;
+	private EventRegistration topicRemovedRegistration;
 
 	public ChatroomController(ChatroomFrame frame, JMSTopic topic, JMSUser user) {
 		this.frame = frame;
@@ -199,6 +201,11 @@ public class ChatroomController implements Serializable {
 
 	public void handleWindowClose() {
 		topicService.removeTopicUser(topic, user);
+		try {
+			topicRemovedRegistration.getLease().cancel();
+		} catch (Exception e) {
+			System.err.println("Failed to remove TopicDeleted listener.");			
+		}
 		
 		frame.superDispose();
 	}
@@ -359,7 +366,7 @@ public class ChatroomController implements Serializable {
 			TopicRemovedRemoteEventListener eventListener = new TopicRemovedRemoteEventListener(this);
 			topicRemovedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 				
-			space.registerForAvailabilityEvent(templates, 
+			topicRemovedRegistration = space.registerForAvailabilityEvent(templates, 
 					null, 
 					true, 
 					topicRemovedStub, 
