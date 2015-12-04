@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import net.jini.core.entry.Entry;
 
+@SuppressWarnings("serial")
 public class JMSUser implements Entry {
 	public String name;
 	public String baseName;

@@ -25,6 +25,7 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 		this.user = user;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void notify(RemoteEvent event) {
 		try {
 			AvailabilityEvent availEvent = (AvailabilityEvent) event;

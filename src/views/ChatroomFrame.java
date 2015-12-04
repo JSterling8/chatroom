@@ -36,7 +36,7 @@ public class ChatroomFrame extends JFrame {
 	private JTable usersTable;
 
 	public ChatroomFrame(JMSTopic topic, JMSUser user) {
-		// TODO Create a "Message Owner" button.
+		// FIXME Create a "Message Owner" button.
 		this.controller = new ChatroomController(this, topic, user);
 
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
@@ -57,7 +57,6 @@ public class ChatroomFrame extends JFrame {
 		messagesTable.getColumnModel().getColumn(0).setPreferredWidth(100);
 		messagesTable.getColumnModel().getColumn(1).setPreferredWidth(100);
 		messagesTable.getColumnModel().getColumn(2).setPreferredWidth(800);
-		messagesTable.getSelectionModel().addListSelectionListener(new SharedMessageListSelectionHandler());
 		controller.highlightAllPMsInInitialTableModel();
 
 		JScrollPane spMessages = new JScrollPane(messagesTable);
@@ -156,19 +155,6 @@ public class ChatroomFrame extends JFrame {
 			} else {
 			}
 
-		}
-	}
-
-	private class SharedMessageListSelectionHandler implements ListSelectionListener {
-		public void valueChanged(ListSelectionEvent e) {
-			ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-
-			// TODO Implement private messaging on message selection...
-
-			if (!lsm.isSelectionEmpty()) {
-				int selectedRowIndex = lsm.getMinSelectionIndex();
-			} else {
-			}
 		}
 	}
 }

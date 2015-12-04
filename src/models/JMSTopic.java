@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import net.jini.core.entry.Entry;
 
+@SuppressWarnings("serial")
 public class JMSTopic implements Entry {
 	public UUID id;
 	public String name;

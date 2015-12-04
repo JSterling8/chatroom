@@ -178,6 +178,7 @@ public class MainMenuFrame extends JFrame {
 		return controller;
 	}
 	
+	@SuppressWarnings("serial")
 	private void createKeyBindings(JTable table) {
 		table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
 		    table.getActionMap().put("Enter", new AbstractAction() {

@@ -1,7 +1,5 @@
 package services;
 
-import java.util.Properties;
-
 import org.apache.commons.lang3.StringUtils;
 
 import net.jini.core.discovery.LookupLocator;
@@ -25,6 +23,7 @@ public class SpaceService {
 	    System.setProperty("java.rmi.server.codebase", clazz.getProtectionDomain().getCodeSource().getLocation().toString());
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public static JavaSpace05 getSpace(String hostname) {
 		if (space == null) {			
 			try {
@@ -54,6 +53,7 @@ public class SpaceService {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static TransactionManager getManager(String hostname) {
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());

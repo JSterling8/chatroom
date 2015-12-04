@@ -43,7 +43,7 @@ public class MessageService implements Serializable {
 	public List<JMSMessage> getAllMessagesForUserInTopic(JMSTopic topic, JMSUser user) {
 		List<JMSMessage> allMessages = lookupHelper.findAllMatchingTemplate(space, new JMSMessage(topic));
 		
-		Iterator it = allMessages.iterator();
+		Iterator<JMSMessage> it = allMessages.iterator();
 		
 		while(it.hasNext()){
 			JMSMessage message = (JMSMessage) it.next();

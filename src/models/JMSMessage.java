@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import net.jini.core.entry.Entry;
 
+@SuppressWarnings("serial")
 public class JMSMessage implements Entry {
 	public JMSTopic topic;
 	public Date sentDate;

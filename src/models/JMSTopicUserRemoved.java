@@ -9,6 +9,7 @@ import net.jini.core.entry.Entry;
  * @author anon
  *
  */
+@SuppressWarnings("serial")
 public class JMSTopicUserRemoved implements Entry {
 	public JMSTopicUser topicUser;
 	

@@ -2,8 +2,6 @@ package controllers;
 
 import javax.swing.SwingUtilities;
 
-import listeners.MessageRemoteEventListener;
-import services.SpaceService;
 import views.LoginFrame;
 
 //FIXME - Makes views resize better

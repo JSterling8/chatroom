@@ -11,7 +11,9 @@ import javax.swing.table.TableModel;
 
 public class ColoredTable extends JTable
 {
-     Map<Integer, Color> rowColor = new HashMap<Integer, Color>();
+	private static final long serialVersionUID = -1118415077892936053L;
+	
+	private Map<Integer, Color> rowColor = new HashMap<Integer, Color>();
 
      public ColoredTable(TableModel model)
      {

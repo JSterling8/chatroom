@@ -2,6 +2,7 @@ package models;
 
 import net.jini.core.entry.Entry;
 
+@SuppressWarnings("serial")
 public class JMSTopicUser implements Entry {
 	public JMSTopic topic;
 	public JMSUser user;

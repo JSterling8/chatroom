@@ -3,7 +3,6 @@ package controllers;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.Serializable;
-import java.rmi.MarshalledObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +22,6 @@ import models.JMSMessage;
 import models.JMSTopic;
 import models.JMSTopicUser;
 import models.JMSUser;
-import net.jini.core.event.RemoteEvent;
 import net.jini.core.event.RemoteEventListener;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.TransactionException;
@@ -31,7 +29,6 @@ import net.jini.export.Exporter;
 import net.jini.jeri.BasicILFactory;
 import net.jini.jeri.BasicJeriExporter;
 import net.jini.jeri.tcp.TcpServerEndpoint;
-import net.jini.space.AvailabilityEvent;
 import net.jini.space.JavaSpace05;
 import services.MessageService;
 import services.SpaceService;
@@ -88,10 +85,12 @@ public class ChatroomController implements Serializable {
 		if(messages != null && messages.size() > 0){
 			data = new Object[messages.size()][4];
 			for(int i = 0; i < messages.size(); i++){
+				@SuppressWarnings("deprecation")
 				String minutes = "" + messages.get(i).getSentDate().getMinutes();
 				if(minutes.length() == 1){
 					minutes = "0" + minutes;
 				}
+				@SuppressWarnings("deprecation")
 				String hours = "" + messages.get(i).getSentDate().getHours();
 				data[i][0] = hours + ":" + minutes;
 				data[i][1] = messages.get(i).getFrom().getName();
@@ -130,7 +129,6 @@ public class ChatroomController implements Serializable {
 
 	public void handleSubmitPressed(String text) {
 		JTextField tfMessageInput = frame.getTfMessageInput();
-		boolean isPrivateMessage = false;
 		
 		// If text is not blank, it's a private message.
 		if(StringUtils.isBlank(text)){
@@ -143,7 +141,6 @@ public class ChatroomController implements Serializable {
 				if(StringUtils.isBlank(nameSendingMessageTo)){
 					messageService.createMessage(new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), text));
 					successfullyAddedToSpace = true;
-					isPrivateMessage = false;
 				} else {
 					String baseName = userService.getBaseNameFromName(nameSendingMessageTo);
 					JMSUser userTo = userService.getUserByBaseName(baseName);
@@ -154,7 +151,6 @@ public class ChatroomController implements Serializable {
 					
 					// Reset this variable
 					nameSendingMessageTo = null;
-					isPrivateMessage = true;
 				}
 			} catch (Exception e) {
 				System.err.println("Failed to create public message in topic.");
