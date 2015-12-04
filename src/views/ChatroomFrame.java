@@ -25,6 +25,8 @@ import java.awt.Component;
 import java.awt.Font;
 
 public class ChatroomFrame extends JFrame {
+	private static final long serialVersionUID = -6904280288906125276L;
+	
 	private DefaultTableModel messagesTableModel;
 	private DefaultTableModel usersTableModel;
 	private ChatroomController controller;
@@ -34,8 +36,6 @@ public class ChatroomFrame extends JFrame {
 	private JTable usersTable;
 
 	public ChatroomFrame(JMSTopic topic, JMSUser user) {
-		// TODO Set default column widths so timestamp and name are smaller than
-		// message block.
 		// TODO Create a "Message Owner" button.
 		this.controller = new ChatroomController(this, topic, user);
 
@@ -46,7 +46,6 @@ public class ChatroomFrame extends JFrame {
 		panel.setLayout(null);
 
 		messagesTableModel = controller.generateMessagesTableModel();
-
 		messagesTable = new ColoredTable(messagesTableModel);
 		messagesTable.removeColumn(messagesTable.getColumnModel().getColumn(3));
 		messagesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -55,6 +54,9 @@ public class ChatroomFrame extends JFrame {
 			Class<?> columnClass = messagesTable.getColumnClass(i);
 			messagesTable.setDefaultEditor(columnClass, null);
 		}
+		messagesTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+		messagesTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+		messagesTable.getColumnModel().getColumn(2).setPreferredWidth(800);
 		messagesTable.getSelectionModel().addListSelectionListener(new SharedMessageListSelectionHandler());
 		controller.highlightAllPMsInInitialTableModel();
 

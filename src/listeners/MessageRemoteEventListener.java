@@ -39,7 +39,15 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 				JMSUser userFrom = message.getFrom();
 				String messageText = message.getMessage();
 				Date sentDate = message.getSentDate();
-				Object[] rowData = { sentDate.toString(), userFrom.getName(), messageText };
+				
+				String minutes = "" + sentDate.getMinutes();
+				if(minutes.length() == 1){
+					minutes = "0" + minutes;
+				}
+				String hours = "" + sentDate.getHours();
+				String timestamp = hours + ":" + minutes;
+				
+				Object[] rowData = { timestamp, userFrom.getName(), messageText };
 				controller.getMessagesTableModel().addRow(rowData);
 				
 				// If it's a PM, mark it as such...

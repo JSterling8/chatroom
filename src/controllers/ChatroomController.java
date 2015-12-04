@@ -42,10 +42,8 @@ import views.ColoredTable;
 
 public class ChatroomController implements Serializable {
 	// FIXME Word wrap message cells.
-	// FIXME Private messages that are seen by sender, recipient, and topic owner
-	// FIXME Notifications for messages and private messages
-	// TODO Spam prevention
 	// TODO Topic deleted notification?
+	// TODO User leaving notification
 	private static final long serialVersionUID = 523026449422229593L;
 	private static final UserService userService = UserService.getUserService();
 	private ChatroomFrame frame;
@@ -74,7 +72,7 @@ public class ChatroomController implements Serializable {
 	}
 
 	public DefaultTableModel generateMessagesTableModel() {
-		Object[] columns = { "Date/Time", "User", "Message", "Message ID" };
+		Object[] columns = { "Time Sent", "User", "Message", "Message ID" };
 		List<JMSMessage> messages = messageService.getAllMessagesForUserInTopic(topic, user);
 		
 		for(int i = 0; i < messages.size(); i++) {
@@ -90,7 +88,12 @@ public class ChatroomController implements Serializable {
 		if(messages != null && messages.size() > 0){
 			data = new Object[messages.size()][4];
 			for(int i = 0; i < messages.size(); i++){
-				data[i][0] = messages.get(i).getSentDate();
+				String minutes = "" + messages.get(i).getSentDate().getMinutes();
+				if(minutes.length() == 1){
+					minutes = "0" + minutes;
+				}
+				String hours = "" + messages.get(i).getSentDate().getHours();
+				data[i][0] = hours + ":" + minutes;
 				data[i][1] = messages.get(i).getFrom().getName();
 				data[i][2] = messages.get(i).getMessage();
 				data[i][3] = messages.get(i).getId();
@@ -161,15 +164,8 @@ public class ChatroomController implements Serializable {
 			}
 			
 			if(successfullyAddedToSpace){
-/*				Object[] rowData = {new Date(System.currentTimeMillis()).toString(), user.getName(), text};
-				messagesTableModel.addRow(rowData);*/
-			
 				scrollToBottomOfMessages();
 				tfMessageInput.setText(null);
-				
-/*				if(isPrivateMessage){
-					colourBottomMessageRed();
-				}*/
 			} else {
 				JOptionPane.showMessageDialog(frame, "Failed to send message to server.  Perhaps the owner has deleted the topic?");
 			}
