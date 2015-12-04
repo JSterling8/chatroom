@@ -148,14 +148,11 @@ public class ChatroomFrame extends JFrame {
 	private class SharedUserListSelectionHandler implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent e) {
 			ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-			// TODO Implement private messaging on user selection...
 			
 			if (!lsm.isSelectionEmpty()) {
 				int selectedRowIndex = lsm.getMinSelectionIndex();
 				nameSelected = (String) usersTableModel.getValueAt(selectedRowIndex, 0);
-			} else {
 			}
-
 		}
 	}
 }
