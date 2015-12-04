@@ -17,10 +17,12 @@ import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang3.StringUtils;
 
 import listeners.MessageRemoteEventListener;
+import listeners.TopicRemovedRemoteEventListener;
 import listeners.TopicUserAddedRemoteEventListener;
 import listeners.TopicUserRemovedRemoteEventListener;
 import models.JMSMessage;
 import models.JMSTopic;
+import models.JMSTopicDeleted;
 import models.JMSTopicUser;
 import models.JMSTopicUserRemoved;
 import models.JMSUser;
@@ -53,9 +55,10 @@ public class ChatroomController implements Serializable {
 	private JMSUser user;
 	private String nameSendingMessageTo;
 	private List<Integer> rowsToHighlight = new ArrayList<Integer>();
-	private RemoteEventListener theMessagesStub;
-	private RemoteEventListener theUsersAddedStub;
-	private RemoteEventListener theUsersRemovedStub;
+	private RemoteEventListener messageReceivedStub;
+	private RemoteEventListener usersAddedStub;
+	private RemoteEventListener usersRemovedStub;
+	private RemoteEventListener topicRemovedStub;
 
 	public ChatroomController(ChatroomFrame frame, JMSTopic topic, JMSUser user) {
 		this.frame = frame;
@@ -69,6 +72,7 @@ public class ChatroomController implements Serializable {
 		registerMessageListener();
 		registerUserAddedListener();
 		registerUserRemovedListener();
+		registerTopicRemovedListener();
 	}
 
 	public DefaultTableModel generateMessagesTableModel() {
@@ -195,6 +199,8 @@ public class ChatroomController implements Serializable {
 
 	public void handleWindowClose() {
 		topicService.removeTopicUser(topic, user);
+		
+		frame.superDispose();
 	}
 
 	public void handlePrivateMessageSendPressed() {
@@ -236,9 +242,9 @@ public class ChatroomController implements Serializable {
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			MessageRemoteEventListener eventListener = new MessageRemoteEventListener(this, topic, user);
-			theMessagesStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+			messageReceivedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 
-			space.registerForAvailabilityEvent(templates, null, true, theMessagesStub, Lease.FOREVER, // Should
+			space.registerForAvailabilityEvent(templates, null, true, messageReceivedStub, Lease.FOREVER, // Should
 																										// maybe
 																										// not
 																										// be
@@ -264,9 +270,9 @@ public class ChatroomController implements Serializable {
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			TopicUserAddedRemoteEventListener eventListener = new TopicUserAddedRemoteEventListener(this);
-			theUsersAddedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+			usersAddedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 
-			space.registerForAvailabilityEvent(templates, null, true, theUsersAddedStub, Lease.FOREVER, // Should
+			space.registerForAvailabilityEvent(templates, null, true, usersAddedStub, Lease.FOREVER, // Should
 																										// maybe
 																										// not
 																										// be
@@ -292,9 +298,9 @@ public class ChatroomController implements Serializable {
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			TopicUserRemovedRemoteEventListener eventListener = new TopicUserRemovedRemoteEventListener(this);
-			theUsersRemovedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+			usersRemovedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 
-			space.registerForAvailabilityEvent(templates, null, true, theUsersRemovedStub, Lease.FOREVER, // Should
+			space.registerForAvailabilityEvent(templates, null, true, usersRemovedStub, Lease.FOREVER, // Should
 																											// maybe
 																											// not
 																											// be
@@ -328,22 +334,40 @@ public class ChatroomController implements Serializable {
 		return usersTableModel;
 	}
 
-	public void warnUserTopicDeleted() {
+	public void handleTopicDeleted() {
+		messagesTableModel = null;
+		
 		JOptionPane.showMessageDialog(frame, "This topic (" + topic.getName()
-				+ ") has been deleted by its owner.  The topic window will close in 10 seconds.");
-
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(10000l);
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					handleWindowClose();
-				}
-			}
-		});
-
-		t.start();
+				+ ") has been deleted by its owner.  The topic window will now close.");
+				
+		handleWindowClose();
+	}
+	
+	private void registerTopicRemovedListener() {
+		JavaSpace05 space = SpaceService.getSpace();
+		JMSTopicDeleted template = new JMSTopicDeleted(topic);
+		ArrayList<JMSTopicDeleted> templates = new ArrayList<JMSTopicDeleted>(1);
+		templates.add(template);
+		
+		try {
+			// create the exporter
+			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
+								false, true);
+		
+			// register this as a remote object
+			// and get a reference to the 'stub'
+			TopicRemovedRemoteEventListener eventListener = new TopicRemovedRemoteEventListener(this);
+			topicRemovedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+				
+			space.registerForAvailabilityEvent(templates, 
+					null, 
+					true, 
+					topicRemovedStub, 
+					Lease.FOREVER, // Should maybe not be forever?
+					null);
+		} catch (TransactionException | IOException e) {
+			System.err.println("Failed to get new topic(s)");
+			e.printStackTrace();
+		}
 	}
 }

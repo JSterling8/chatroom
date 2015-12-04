@@ -37,7 +37,7 @@ public class TopicRemovedRemoteEventListener implements RemoteEventListener{
 			JMSTopicDeleted topicDeleted = (JMSTopicDeleted) availEvent.getEntry();
 			
 			if(isChatroomController) {
-				chatroomController.warnUserTopicDeleted();
+				chatroomController.handleTopicDeleted();
 			} else {
 				DefaultTableModel topicTableModel = mainMenuController.getTopicTableModel();
 				for(int i = 0; i < topicTableModel.getRowCount(); i++) {

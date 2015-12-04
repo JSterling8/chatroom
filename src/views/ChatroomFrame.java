@@ -140,9 +140,11 @@ public class ChatroomFrame extends JFrame {
 
 	@Override
 	public void dispose() {
-		super.dispose();
-
 		controller.handleWindowClose();
+	}
+	
+	public void superDispose(){
+		super.dispose();
 	}
 
 	private class SharedUserListSelectionHandler implements ListSelectionListener {

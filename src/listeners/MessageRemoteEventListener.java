@@ -49,11 +49,13 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 				String timestamp = hours + ":" + minutes;
 				
 				Object[] rowData = { timestamp, userFrom.getName(), messageText };
-				controller.getMessagesTableModel().addRow(rowData);
-				
-				// If it's a PM, mark it as such...
-				if(message.getTo() != null) {
-					controller.colourBottomMessage();
+				if(controller.getMessagesTableModel() != null){
+					controller.getMessagesTableModel().addRow(rowData);
+					
+					// If it's a PM, mark it as such...
+					if(message.getTo() != null) {
+						controller.colourBottomMessage();
+					}
 				}
 			} else {
 				// Not for us.  Ignore...
