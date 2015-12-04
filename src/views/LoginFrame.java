@@ -24,8 +24,6 @@ import controllers.LoginController;
 import java.awt.Color;
 import java.awt.Font;
 
-//FIXME Make usernames have to be 1-12 chars
-//FIXME Make passwords have to be 5-100 chars
 public class LoginFrame extends JFrame {
 	private static final long serialVersionUID = 1479957234936275504L;
 	private LoginController controller;

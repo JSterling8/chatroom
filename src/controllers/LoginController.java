@@ -64,7 +64,10 @@ public class LoginController {
 	public void handleCreateButtonPressed(String username, String password) {
 		if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
 			JOptionPane.showMessageDialog(loginFrame, "Please enter a non-blank username and password to continue.");
+		} else if(username.length() > 12){
+			JOptionPane.showMessageDialog(loginFrame, "Username must be 1 - 12 characters long.");
 		} else if (password.length() < 5 || password.length() > 50){
+		
 			JOptionPane.showMessageDialog(loginFrame, "Password must be 5 - 50 characters long.");
 		} else {
 			String passwordConfirmation = getPasswordConfirmation();
