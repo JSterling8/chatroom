@@ -42,20 +42,26 @@ public class MessageService implements Serializable {
 
 	public List<JMSMessage> getAllMessagesForUserInTopic(JMSTopic topic, JMSUser user) {
 		List<JMSMessage> allMessages = lookupHelper.findAllMatchingTemplate(space, new JMSMessage(topic));
-		
+
 		Iterator<JMSMessage> it = allMessages.iterator();
-		
-		while(it.hasNext()){
+
+		while (it.hasNext()) {
 			JMSMessage message = (JMSMessage) it.next();
-			if(message.getTo() != null && 
-					message.getTo().getId() != user.getId()){
+			if (message.getTo() != null && message.getTo().getId() != user.getId()) {
 				it.remove();
 			}
 		}
-		
-		//TODO Research if I actually need this? I don't appear to
+
+		/*
+		 * Ensure that the MatchSet is returned in order. Tests show that they
+		 * always are in order, however there is no guarantee for this from the
+		 * JavaDoc. In the case that the list is already in order, the
+		 * complexity of this sort is O(n), and doesn't add a significant
+		 * overhead.
+		 *
+		 */
 		Collections.sort(allMessages, new MessageComparator());
-		
+
 		return allMessages;
 	}
 
@@ -72,7 +78,7 @@ public class MessageService implements Serializable {
 				}
 
 				// This check is here to guard against a wildcard match when we
-				// check to see if the user the message is being sent to is
+				// later check to see if the user the message is being sent to is
 				// still in the space
 				if (anyFieldNull(message.getTo())) {
 					throw new InvalidAttributeValueException(
@@ -102,7 +108,10 @@ public class MessageService implements Serializable {
 	}
 
 	private boolean anyFieldNull(JMSUser to) {
-		if (to.getBaseName() == null || to.getName() == null || to.getId() == null || to.getPassword() == null) {
+		if (to.getBaseName() == null || 
+				to.getName() == null || 
+				to.getId() == null || 
+				to.getPassword() == null) {
 			return true;
 		} else {
 			return false;
@@ -129,9 +138,9 @@ public class MessageService implements Serializable {
 	}
 
 	public class MessageComparator implements Comparator<JMSMessage> {
-	    @Override
-	    public int compare(JMSMessage o1, JMSMessage o2) {
-	        return o1.getSentDate().compareTo(o2.getSentDate());
-	    }
+		@Override
+		public int compare(JMSMessage o1, JMSMessage o2) {
+			return o1.getSentDate().compareTo(o2.getSentDate());
+		}
 	}
 }
