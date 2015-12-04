@@ -25,8 +25,7 @@ public class EntryLookupHelper implements Serializable {
 			List<T> templateList = new ArrayList<T>(1);
 			templateList.add(template);
 			
-			//TODO - Assert there are never more than 20000 entries in the space?
-			MatchSet matchSet = space.contents(templateList, transaction, 500, 20000);
+			MatchSet matchSet = space.contents(templateList, transaction, 500, Long.MAX_VALUE);
 			
 			T entry = (T) matchSet.next();
 			while(entry != null){
