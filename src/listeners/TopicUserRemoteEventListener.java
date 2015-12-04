@@ -1,6 +1,9 @@
 package listeners;
 
 import java.io.Serializable;
+import java.util.UUID;
+
+import javax.swing.table.DefaultTableModel;
 
 import controllers.ChatroomController;
 import models.JMSTopicUser;
@@ -26,12 +29,29 @@ public class TopicUserRemoteEventListener implements RemoteEventListener, Serial
 			JMSTopicUser topicUser = (JMSTopicUser) availEvent.getEntry();
 			JMSUser user = topicUser.getUser();
 			
-			Object[] rowData = { user.getName(), user.getId() };
-			
-			controller.getUsersTableModel().addRow(rowData);
+			if(notAlreadyInUserList(user)){
+				Object[] rowData = { user.getName(), user.getId() };
+				
+				controller.getUsersTableModel().addRow(rowData);
+			}
 		} catch (Exception e) {
 			System.err.println("Failed to run notify method for TopicUsers");
 			e.printStackTrace();
 		}
+	}
+
+	private boolean notAlreadyInUserList(JMSUser user) {
+		DefaultTableModel userTableModel = controller.getUsersTableModel();
+		int rows = userTableModel.getRowCount();
+		
+		for(int i = 0; i < rows; i++){
+			UUID idInTable = (UUID) userTableModel.getValueAt(i, 1);
+			
+			if(idInTable.equals(user.getId())) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }
