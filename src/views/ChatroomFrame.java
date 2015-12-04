@@ -106,7 +106,7 @@ public class ChatroomFrame extends JFrame {
 			@Override
 			public void keyPressed(KeyEvent arg0) {
 				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
-					controller.handleSubmitPressed(null);
+					controller.handleSubmitPressed();
 				}
 			}
 		});
@@ -118,7 +118,7 @@ public class ChatroomFrame extends JFrame {
 		btnSubmit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				controller.handleSubmitPressed(null);
+				controller.handleSubmitPressed();
 			}
 		});
 		btnSubmit.setBounds(712, 461, 110, 31);

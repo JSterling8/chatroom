@@ -7,6 +7,7 @@ import javax.swing.table.DefaultTableModel;
 
 import controllers.ChatroomController;
 import controllers.MainMenuController;
+import models.JMSTopic;
 import models.JMSTopicDeleted;
 import net.jini.core.event.RemoteEvent;
 import net.jini.core.event.RemoteEventListener;
@@ -41,7 +42,8 @@ public class TopicRemovedRemoteEventListener implements RemoteEventListener{
 				DefaultTableModel topicTableModel = mainMenuController.getTopicTableModel();
 				for(int i = 0; i < topicTableModel.getRowCount(); i++) {
 					UUID topicIdInTable = (UUID) topicTableModel.getValueAt(i, 4);
-					UUID topicDeletedId = topicDeleted.getTopic().getId();
+					JMSTopic topicRemoved = topicDeleted.getTopic();
+					UUID topicDeletedId = topicRemoved.getId();
 					
 					if(topicIdInTable.equals(topicDeletedId)) {
 						topicTableModel.removeRow(i);

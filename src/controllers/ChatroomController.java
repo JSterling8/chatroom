@@ -129,8 +129,12 @@ public class ChatroomController implements Serializable {
 	public void setNameMessageTo(String name) {
 		this.nameSendingMessageTo = name;
 	}
+	
+	public void handleSubmitPressed(){
+		handleSubmitPressed(null);
+	}
 
-	public void handleSubmitPressed(String text) {
+	private void handleSubmitPressed(String text) {
 		JTextField tfMessageInput = frame.getTfMessageInput();
 
 		// If text is not blank, it's a private message.

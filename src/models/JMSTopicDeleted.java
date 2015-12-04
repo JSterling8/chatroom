@@ -12,7 +12,7 @@ public class JMSTopicDeleted implements Entry {
 	}
 	
 	public JMSTopicDeleted(JMSTopic topic) {
-		
+		this.topic = topic;
 	}
 
 	public JMSTopic getTopic() {
