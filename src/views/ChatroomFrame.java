@@ -126,6 +126,7 @@ public class ChatroomFrame extends JFrame {
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(new Dimension(850, 550));
+		setTitle(topic.getName());
 		setVisible(true);
 	}
 

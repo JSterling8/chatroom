@@ -23,6 +23,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import controllers.LoginController;
 
+// TODO Tell user names must be 1-12 chars and passwords 5-50 chars BEFORE they attempt to create an account
 public class LoginFrame extends JFrame {
 	private static final long serialVersionUID = 1479957234936275504L;
 	private LoginController controller;
@@ -111,6 +112,7 @@ public class LoginFrame extends JFrame {
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(450, 200));
+		setTitle("Login/Register");
 		setVisible(true);
 	}
 }
