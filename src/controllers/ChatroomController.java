@@ -42,7 +42,6 @@ import views.ColoredTable;
 public class ChatroomController implements Serializable {
 	// FIXME Word wrap message cells.
 	// TODO Topic deleted notification?
-	// TODO User leaving notification
 	private static final long serialVersionUID = 523026449422229593L;
 	private static final UserService userService = UserService.getUserService();
 	private ChatroomFrame frame;
