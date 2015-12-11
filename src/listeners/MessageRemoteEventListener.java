@@ -32,10 +32,10 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 			JMSMessage message = (JMSMessage) availEvent.getEntry();
 			
 			if 	(	
-					message.getTopic().getId().equals(topic.getId()) ||	
-					message.getTo() == null ||
+					message.getTopic().getId().equals(topic.getId()) &&	
+					(message.getTo() == null ||
 					message.getTo().getId().equals(user.getId()) || 
-					message.getFrom().getId().equals(user.getId())
+					message.getFrom().getId().equals(user.getId()))
 				) {
 				JMSUser userFrom = message.getFrom();
 				String messageText = message.getMessage();
