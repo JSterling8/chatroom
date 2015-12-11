@@ -80,7 +80,7 @@ public class MessageService implements Serializable {
 				// This check is here to guard against a wildcard match when we
 				// later check to see if the user the message is being sent to is
 				// still in the space
-				if (anyFieldNull(message.getTo())) {
+				if (isInvalidUser(message.getTo())) {
 					throw new InvalidAttributeValueException(
 							"Message being sent to invalid user object (one or more fields null)");
 				}
@@ -107,7 +107,7 @@ public class MessageService implements Serializable {
 		}
 	}
 
-	private boolean anyFieldNull(JMSUser to) {
+	private boolean isInvalidUser(JMSUser to) {
 		if (to.getBaseName() == null || 
 				to.getName() == null || 
 				to.getId() == null || 
