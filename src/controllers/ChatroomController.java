@@ -61,6 +61,9 @@ public class ChatroomController implements Serializable {
 	private RemoteEventListener usersRemovedStub;
 	private RemoteEventListener topicRemovedStub;
 	private EventRegistration topicRemovedRegistration;
+	private EventRegistration messageReceivedRegistration;
+	private EventRegistration userAddedRegistration;
+	private EventRegistration userRemovedRegistration;
 
 	public ChatroomController(ChatroomFrame frame, JMSTopic topic, JMSUser user) {
 		this.frame = frame;
@@ -135,8 +138,8 @@ public class ChatroomController implements Serializable {
 	public void setNameMessageTo(String name) {
 		this.nameSendingMessageTo = name;
 	}
-	
-	public void handleSubmitPressed(){
+
+	public void handleSubmitPressed() {
 		handleSubmitPressed(null);
 	}
 
@@ -203,10 +206,13 @@ public class ChatroomController implements Serializable {
 		topicService.removeTopicUser(topic, user);
 		try {
 			topicRemovedRegistration.getLease().cancel();
+			messageReceivedRegistration.getLease().cancel();
+			userAddedRegistration.getLease().cancel();
+			userRemovedRegistration.getLease().cancel();
 		} catch (Exception e) {
-			System.err.println("Failed to remove TopicDeleted listener.");			
+			System.err.println("Failed to remove TopicDeleted listener.");
 		}
-		
+
 		frame.superDispose();
 	}
 
@@ -251,12 +257,8 @@ public class ChatroomController implements Serializable {
 			MessageRemoteEventListener eventListener = new MessageRemoteEventListener(this, topic, user);
 			messageReceivedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 
-			space.registerForAvailabilityEvent(templates, null, true, messageReceivedStub, Lease.FOREVER, // Should
-																										// maybe
-																										// not
-																										// be
-																										// forever?
-					null);
+			messageReceivedRegistration = space.registerForAvailabilityEvent(templates, null, true, messageReceivedStub,
+					Lease.FOREVER, null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new message(s)");
 			e.printStackTrace();
@@ -279,12 +281,8 @@ public class ChatroomController implements Serializable {
 			TopicUserAddedRemoteEventListener eventListener = new TopicUserAddedRemoteEventListener(this);
 			usersAddedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 
-			space.registerForAvailabilityEvent(templates, null, true, usersAddedStub, Lease.FOREVER, // Should
-																										// maybe
-																										// not
-																										// be
-																										// forever?
-					null);
+			userAddedRegistration = space.registerForAvailabilityEvent(templates, null, true, usersAddedStub,
+					Lease.FOREVER, null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new user(s)");
 			e.printStackTrace();
@@ -307,12 +305,8 @@ public class ChatroomController implements Serializable {
 			TopicUserRemovedRemoteEventListener eventListener = new TopicUserRemovedRemoteEventListener(this);
 			usersRemovedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 
-			space.registerForAvailabilityEvent(templates, null, true, usersRemovedStub, Lease.FOREVER, // Should
-																											// maybe
-																											// not
-																											// be
-																											// forever?
-					null);
+			userRemovedRegistration = space.registerForAvailabilityEvent(templates, null, true, usersRemovedStub,
+					Lease.FOREVER, null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to remove user(s)");
 			e.printStackTrace();
@@ -343,33 +337,30 @@ public class ChatroomController implements Serializable {
 
 	public void handleTopicDeleted() {
 		messagesTableModel = null;
-		
+
 		JOptionPane.showMessageDialog(frame, "This topic (" + topic.getName()
 				+ ") has been deleted by its owner.  The topic window will now close.");
-				
+
 		handleWindowClose();
 	}
-	
+
 	private void registerTopicRemovedListener() {
 		JavaSpace05 space = SpaceService.getSpace();
 		JMSTopicDeleted template = new JMSTopicDeleted(topic);
 		ArrayList<JMSTopicDeleted> templates = new ArrayList<JMSTopicDeleted>(1);
 		templates.add(template);
-		
+
 		try {
 			// create the exporter
 			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
-								false, true);
-		
+					false, true);
+
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			TopicRemovedRemoteEventListener eventListener = new TopicRemovedRemoteEventListener(this);
 			topicRemovedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
-				
-			topicRemovedRegistration = space.registerForAvailabilityEvent(templates, 
-					null, 
-					true, 
-					topicRemovedStub, 
+
+			topicRemovedRegistration = space.registerForAvailabilityEvent(templates, null, true, topicRemovedStub,
 					Lease.FOREVER, // Should maybe not be forever?
 					null);
 		} catch (TransactionException | IOException e) {
