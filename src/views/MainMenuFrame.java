@@ -179,6 +179,13 @@ public class MainMenuFrame extends JFrame {
 		return controller;
 	}
 	
+	@Override
+	public void dispose(){
+		controller.cancelLeases();
+		
+		super.dispose();
+	}
+	
 	@SuppressWarnings("serial")
 	private void createKeyBindings(JTable table) {
 		table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");

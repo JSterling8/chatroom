@@ -2,6 +2,7 @@ package controllers;
 
 import java.awt.Frame;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,8 +19,10 @@ import listeners.TopicRemovedRemoteEventListener;
 import models.JMSTopic;
 import models.JMSTopicDeleted;
 import models.JMSUser;
+import net.jini.core.event.EventRegistration;
 import net.jini.core.event.RemoteEventListener;
 import net.jini.core.lease.Lease;
+import net.jini.core.lease.UnknownLeaseException;
 import net.jini.core.transaction.TransactionException;
 import net.jini.export.Exporter;
 import net.jini.jeri.BasicILFactory;
@@ -40,11 +43,13 @@ public class MainMenuController {
 	private JMSUser user;
 	private RemoteEventListener topicAddedStub;
 	private RemoteEventListener topicRemovedStub;
+	private EventRegistration topicAddedRegistration;
+	private EventRegistration topicRemovedRegistration;
 
 	public MainMenuController(MainMenuFrame frame, JMSUser user) {
 		this.frame = frame;
 		this.user = user;
-		
+
 		registerTopicAddedListener();
 		registerTopicRemovedListener();
 	}
@@ -54,51 +59,40 @@ public class MainMenuController {
 		JMSTopic template = new JMSTopic();
 		ArrayList<JMSTopic> templates = new ArrayList<JMSTopic>(1);
 		templates.add(template);
-		
+
 		try {
-			// create the exporter
 			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
-								false, true);
-		
-			// register this as a remote object
-			// and get a reference to the 'stub'
+					false, true);
+
 			TopicRemoteEventListener eventListener = new TopicRemoteEventListener(this);
 			topicAddedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
-				
-			space.registerForAvailabilityEvent(templates, 
-					null, 
-					true, 
-					topicAddedStub, 
-					Lease.FOREVER, // Should maybe not be forever?
-					null);
+
+			topicAddedRegistration = space.registerForAvailabilityEvent(templates, null, true, topicAddedStub,
+					Lease.FOREVER, null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new topic(s)");
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void registerTopicRemovedListener() {
 		JavaSpace05 space = SpaceService.getSpace();
 		JMSTopicDeleted template = new JMSTopicDeleted();
 		ArrayList<JMSTopicDeleted> templates = new ArrayList<JMSTopicDeleted>(1);
 		templates.add(template);
-		
+
 		try {
 			// create the exporter
 			Exporter myDefaultExporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(0), new BasicILFactory(),
-								false, true);
-		
+					false, true);
+
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			TopicRemovedRemoteEventListener eventListener = new TopicRemovedRemoteEventListener(this);
 			topicRemovedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
-				
-			space.registerForAvailabilityEvent(templates, 
-					null, 
-					true, 
-					topicRemovedStub, 
-					Lease.FOREVER, // Should maybe not be forever?
-					null);
+
+			topicRemovedRegistration = space.registerForAvailabilityEvent(templates, null, true, topicRemovedStub,
+					Lease.FOREVER, null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new topic(s)");
 			e.printStackTrace();
@@ -128,7 +122,7 @@ public class MainMenuController {
 					"Topic Deletion Failed", JOptionPane.ERROR_MESSAGE, null);
 		}
 	}
-	
+
 	public DefaultTableModel getTopicTableModel() {
 		return tableModel;
 	}
@@ -158,6 +152,8 @@ public class MainMenuController {
 	}
 
 	public void logout() {
+		cancelLeases();
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				Frame[] frames = Frame.getFrames();
@@ -170,6 +166,15 @@ public class MainMenuController {
 				new LoginFrame();
 			}
 		});
+	}
+
+	public void cancelLeases() {
+		try {
+			topicAddedRegistration.getLease().cancel();
+			topicRemovedRegistration.getLease().cancel();
+		} catch (UnknownLeaseException | RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void createTopic(String name) {
@@ -186,6 +191,6 @@ public class MainMenuController {
 		tableModel = generateTopicTableModel();
 		table.setModel(tableModel);
 		table.removeColumn(table.getColumnModel().getColumn(MainMenuFrame.COLUMN_INDEX_OF_TOPIC_OWNER_ID));
-		table.removeColumn(table.getColumnModel().getColumn(MainMenuFrame.COLUMN_INDEX_OF_TOPIC_ID - 1));  // -1 is because index 4 becomes index 3 after the column in the line above is removed
+		table.removeColumn(table.getColumnModel().getColumn(MainMenuFrame.COLUMN_INDEX_OF_TOPIC_ID - 1));
 	}
 }
