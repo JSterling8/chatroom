@@ -54,7 +54,7 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 
 					// If it's a PM, mark it as such...
 					if (message.getTo() != null) {
-						controller.colourBottomMessage();
+						controller.highlightBottomMessage();
 					}
 				}
 			} else {

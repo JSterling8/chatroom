@@ -66,7 +66,7 @@ public class MessageService implements Serializable {
 		return allMessages;
 	}
 
-	public void createMessage(JMSMessage message) throws Exception {
+	public void sendMessage(JMSMessage message) throws Exception {
 		Transaction transaction = TransactionHelper.getTransaction();
 
 		if (topicService.doesTopicExistInSpace(message.getTopic(), transaction)) {
