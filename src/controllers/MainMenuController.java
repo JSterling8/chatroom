@@ -151,8 +151,6 @@ public class MainMenuController {
 	}
 
 	public void logout() {
-		cancelLeases();
-
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				Frame[] frames = Frame.getFrames();
@@ -169,10 +167,12 @@ public class MainMenuController {
 
 	public void cancelLeases() {
 		try {
-			topicAddedRegistration.getLease().cancel();
-			topicRemovedRegistration.getLease().cancel();
-		} catch (UnknownLeaseException | RemoteException e) {
-			e.printStackTrace();
+			Lease topicAddedLease = topicAddedRegistration.getLease();
+			topicAddedLease.cancel();
+			Lease topicRemovedLease = topicRemovedRegistration.getLease();
+			topicRemovedLease.cancel();
+		} catch (UnknownLeaseException | RemoteException | NullPointerException e) {
+			System.err.println("Failed to cancel MainMenuController lease(s)");
 		}
 	}
 
