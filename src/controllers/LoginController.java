@@ -20,6 +20,12 @@ import services.helper.PasswordEncryptionHelper;
 import views.LoginFrame;
 import views.MainMenuFrame;
 
+/**
+ * Handles all logic behind a given LoginFrame
+ * 
+ * @author Jonathan Sterling
+ *
+ */
 public class LoginController {
 	private static final UserService userService = UserService.getUserService();
 

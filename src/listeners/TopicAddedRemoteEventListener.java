@@ -8,12 +8,12 @@ import net.jini.core.event.RemoteEvent;
 import net.jini.core.event.RemoteEventListener;
 import net.jini.space.AvailabilityEvent;
 
-public class TopicRemoteEventListener implements RemoteEventListener, Serializable {
+public class TopicAddedRemoteEventListener implements RemoteEventListener, Serializable {
 	private static final long serialVersionUID = -2085393418959111560L;
 	
 	private final MainMenuController controller;
 	
-	public TopicRemoteEventListener(MainMenuController controller){
+	public TopicAddedRemoteEventListener(MainMenuController controller){
 		super();
 		
 		this.controller = controller;

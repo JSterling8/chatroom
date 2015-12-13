@@ -182,71 +182,6 @@ public class ChatroomController implements Serializable {
 	}
 
 	/**
-	 * Handles both public and private message sending.
-	 * 
-	 * @param text
-	 *            The message to send.
-	 */
-	private void handleSubmitPressed(String text) {
-		JTextField tfMessageInput = frame.getTfMessageInput();
-
-		// If text is not blank, it's a private message. If it is blank, we need
-		// to grab the text from the message input box
-		if (StringUtils.isBlank(text)) {
-			text = tfMessageInput.getText();
-		}
-
-		// Makes sure users don't send stupidly long messages.
-		if (text.length() > 1000) {
-			JOptionPane.showMessageDialog(frame, "Messages must be less than 1000 characters.");
-
-			return;
-		}
-
-		// Check that the text to send is not null or blank.
-		if (StringUtils.isNotBlank(text)) {
-			boolean successfullyAddedToSpace = false;
-			try {
-				// If there is no user in particular to send the message to,
-				// it's a public message.
-				if (StringUtils.isBlank(nameSendingMessageTo)) {
-					messageService.sendMessage(new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), text));
-
-					// If something goes wrong, the next line won't be called
-					// (as we'll be in the catch block). So this is how we
-					// know nothing went wrong
-					successfullyAddedToSpace = true;
-				} else {
-					String baseName = userService.getBaseNameFromName(nameSendingMessageTo);
-					JMSUser userTo = userService.getUserByBaseName(baseName);
-
-					if (userTo == null) {
-						throw new ResourceNotFoundException("User sending message to does not exist.");
-					}
-
-					messageService
-							.sendMessage(new JMSMessage(topic, new Date(), user, userTo, UUID.randomUUID(), text));
-					successfullyAddedToSpace = true;
-				}
-			} catch (Exception e) {
-				System.err.println("Failed to create message in topic.");
-				e.printStackTrace();
-			} finally {
-				// Reset this variable for next message send attempt
-				nameSendingMessageTo = null;
-			}
-
-			if (successfullyAddedToSpace) {
-				scrollToBottomOfMessages();
-				tfMessageInput.setText(null);
-			} else {
-				JOptionPane.showMessageDialog(frame,
-						"Failed to send message to server.  Perhaps the owner has deleted the topic?");
-			}
-		}
-	}
-
-	/**
 	 * Highlights the bottom-most row in the messages table grey.
 	 */
 	public void highlightBottomMessage() {
@@ -363,6 +298,71 @@ public class ChatroomController implements Serializable {
 	}
 
 	/**
+	 * Handles both public and private message sending.
+	 * 
+	 * @param text
+	 *            The message to send.
+	 */
+	private void handleSubmitPressed(String text) {
+		JTextField tfMessageInput = frame.getTfMessageInput();
+
+		// If text is not blank, it's a private message. If it is blank, we need
+		// to grab the text from the message input box
+		if (StringUtils.isBlank(text)) {
+			text = tfMessageInput.getText();
+		}
+
+		// Makes sure users don't send stupidly long messages.
+		if (text.length() > 1000) {
+			JOptionPane.showMessageDialog(frame, "Messages must be less than 1000 characters.");
+
+			return;
+		}
+
+		// Check that the text to send is not null or blank.
+		if (StringUtils.isNotBlank(text)) {
+			boolean successfullyAddedToSpace = false;
+			try {
+				// If there is no user in particular to send the message to,
+				// it's a public message.
+				if (StringUtils.isBlank(nameSendingMessageTo)) {
+					messageService.sendMessage(new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), text));
+
+					// If something goes wrong, the next line won't be called
+					// (as we'll be in the catch block). So this is how we
+					// know nothing went wrong
+					successfullyAddedToSpace = true;
+				} else {
+					String baseName = userService.getBaseNameFromName(nameSendingMessageTo);
+					JMSUser userTo = userService.getUserByBaseName(baseName);
+
+					if (userTo == null) {
+						throw new ResourceNotFoundException("User sending message to does not exist.");
+					}
+
+					messageService
+							.sendMessage(new JMSMessage(topic, new Date(), user, userTo, UUID.randomUUID(), text));
+					successfullyAddedToSpace = true;
+				}
+			} catch (Exception e) {
+				System.err.println("Failed to create message in topic.");
+				e.printStackTrace();
+			} finally {
+				// Reset this variable for next message send attempt
+				nameSendingMessageTo = null;
+			}
+
+			if (successfullyAddedToSpace) {
+				scrollToBottomOfMessages();
+				tfMessageInput.setText(null);
+			} else {
+				JOptionPane.showMessageDialog(frame,
+						"Failed to send message to server.  Perhaps the owner has deleted the topic?");
+			}
+		}
+	}
+
+	/**
 	 * Sets up listener for the current topic's deletion.
 	 */
 	private void registerTopicRemovedListener() {
@@ -470,7 +470,7 @@ public class ChatroomController implements Serializable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Moves the current view down so the most recent message is visible.
 	 */
