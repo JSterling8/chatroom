@@ -5,16 +5,23 @@ import java.util.UUID;
 
 import net.jini.core.entry.Entry;
 
+/**
+ * The model representing a message in the application
+ * 
+ * @author Jonathan Sterling
+ *
+ */
 @SuppressWarnings("serial")
 public class JMSMessage implements Entry {
-	public JMSTopic topic;
-	public Date sentDate;
-	public JMSUser from;
-	public JMSUser to;
-	public UUID id;
-	public String message;
+	public JMSTopic topic;				// The topic the message was sent in.
+	public Date sentDate;				// The date/time the message was sent.
+	public JMSUser from;				// The user the message was from
+	public JMSUser to;					// The user the message was to
+	public UUID id;						// The message's unique ID
+	public String message;				// The message text sent
 
 	public JMSMessage() {
+		// Empty constructor for JavaSpaces
 	}
 
 	public JMSMessage(JMSTopic topic, Date sentDate, JMSUser from, JMSUser to, UUID id, String message) {
@@ -28,7 +35,6 @@ public class JMSMessage implements Entry {
 	
 	/**
 	 * Constructor for easier template creation to get all messages belonging to topic
-	 * 
 	 */
 	public JMSMessage(JMSTopic topic){
 		this.topic = topic;
