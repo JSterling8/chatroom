@@ -47,7 +47,8 @@ public class MessageService implements Serializable {
 
 		while (it.hasNext()) {
 			JMSMessage message = (JMSMessage) it.next();
-			if (message.getTo() != null && message.getTo().getId() != user.getId()) {
+			if (message.getTo() != null && (!message.getTo().getId().equals(user.getId())
+					&& !message.getFrom().getId().equals(user.getId()))) {
 				it.remove();
 			}
 		}
@@ -78,7 +79,8 @@ public class MessageService implements Serializable {
 				}
 
 				// This check is here to guard against a wildcard match when we
-				// later check to see if the user the message is being sent to is
+				// later check to see if the user the message is being sent to
+				// is
 				// still in the space
 				if (isInvalidUser(message.getTo())) {
 					throw new InvalidAttributeValueException(
@@ -108,10 +110,7 @@ public class MessageService implements Serializable {
 	}
 
 	private boolean isInvalidUser(JMSUser to) {
-		if (to.getBaseName() == null || 
-				to.getName() == null || 
-				to.getId() == null || 
-				to.getPassword() == null) {
+		if (to.getBaseName() == null || to.getName() == null || to.getId() == null || to.getPassword() == null) {
 			return true;
 		} else {
 			return false;

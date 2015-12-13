@@ -42,9 +42,16 @@ import services.UserService;
 import views.ChatroomFrame;
 import views.ColoredTable;
 
+/**
+ * Controlls a given ChatroomFrame.
+ * 
+ * @author Jonathan Sterling
+ *
+ */
 public class ChatroomController implements Serializable {
 	private static final long serialVersionUID = 523026449422229593L;
 	private static final UserService userService = UserService.getUserService();
+
 	private ChatroomFrame frame;
 	private DefaultTableModel messagesTableModel;
 	private DefaultTableModel usersTableModel;
@@ -78,6 +85,11 @@ public class ChatroomController implements Serializable {
 		registerTopicRemovedListener();
 	}
 
+	/**
+	 * Gets all messages for its topic and puts them into a DefaultTableModel.
+	 * 
+	 * @return A DefaultTableModel containing all of a Chatroom's messages.s
+	 */
 	public DefaultTableModel generateMessagesTableModel() {
 		Object[] columns = { "Time Sent", "User", "Message", "Message ID" };
 		List<JMSMessage> messages = messageService.getAllMessagesForUserInTopic(topic, user);
@@ -85,9 +97,11 @@ public class ChatroomController implements Serializable {
 		for (int i = 0; i < messages.size(); i++) {
 			JMSMessage message = messages.get(i);
 
-			if (message.getTo() != null && StringUtils.isNotBlank(message.getTo().getName())) {
+			// If the message has a non-null "to" field, then it is a private
+			// message and should be highlighted as such.
+			if (message.getTo() != null) {
 				rowsToHighlight.add(i);
-			}
+			} 
 		}
 
 		Object[][] data = {};
@@ -148,11 +162,10 @@ public class ChatroomController implements Serializable {
 		if (StringUtils.isBlank(text)) {
 			text = tfMessageInput.getText();
 		}
-		
-		if(text.length() > 1000) {
-			JOptionPane.showMessageDialog(frame,
-					"Messages must be less than 1000 characters.");
-			
+
+		if (text.length() > 1000) {
+			JOptionPane.showMessageDialog(frame, "Messages must be less than 1000 characters.");
+
 			return;
 		}
 
@@ -166,7 +179,6 @@ public class ChatroomController implements Serializable {
 				} else {
 					String baseName = userService.getBaseNameFromName(nameSendingMessageTo);
 					JMSUser userTo = userService.getUserByBaseName(baseName);
-					text = "PM TO '" + userTo.getName() + "': " + text;
 
 					messageService
 							.createMessage(new JMSMessage(topic, new Date(), user, userTo, UUID.randomUUID(), text));
@@ -216,7 +228,7 @@ public class ChatroomController implements Serializable {
 			userRemovedRegistration.getLease().cancel();
 		} catch (Exception e) {
 			System.err.println("Failed to remove ChatroomController listener(s).");
-		}		
+		}
 	}
 
 	public void handlePrivateMessageSendPressed() {
