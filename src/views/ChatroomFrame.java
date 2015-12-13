@@ -58,9 +58,6 @@ public class ChatroomFrame extends JFrame {
 		messagesTable.getColumnModel().getColumn(0).setPreferredWidth(100);
 		messagesTable.getColumnModel().getColumn(1).setPreferredWidth(100);
 		messagesTable.getColumnModel().getColumn(2).setPreferredWidth(800);
-		messagesTable.getColumnModel().getColumn(0).setCellRenderer(new MyCellRenderer());
-		messagesTable.getColumnModel().getColumn(1).setCellRenderer(new MyCellRenderer());
-		messagesTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
 		controller.highlightAllPMsInInitialTableModel();
 
 		JScrollPane spMessages = new JScrollPane(messagesTable);
@@ -159,30 +156,4 @@ public class ChatroomFrame extends JFrame {
 			}
 		}
 	}
-	
-	/**
-	 * 
-	 * Class from user "843804" on https://community.oracle.com/thread/1362611?start=0&tstart=0
-	 *
-	 */
-	public class MyCellRenderer extends JTextArea implements TableCellRenderer {
-	     public MyCellRenderer() {
-	       setLineWrap(true);
-	       setWrapStyleWord(true);
-	    }
-
-	   public Component getTableCellRendererComponent(JTable table, Object
-	           value, boolean isSelected, boolean hasFocus, int row, int column) {
-	       setText((String) value);//or something in value, like value.getNote()...
-	       
-	       setSize(table.getColumnModel().getColumn(column).getWidth(),
-	               getPreferredSize().height);
-	       
-	       if (table.getRowHeight(row) != getPreferredSize().height) {
-	               table.setRowHeight(row, getPreferredSize().height);
-	       }
-	       
-	       return this;
-	   }
-	} 
 }
