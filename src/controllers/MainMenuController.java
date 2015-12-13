@@ -167,10 +167,8 @@ public class MainMenuController {
 
 	public void cancelLeases() {
 		try {
-			Lease topicAddedLease = topicAddedRegistration.getLease();
-			topicAddedLease.cancel();
-			Lease topicRemovedLease = topicRemovedRegistration.getLease();
-			topicRemovedLease.cancel();
+			topicAddedRegistration.getLease().cancel();
+			topicRemovedRegistration.getLease().cancel();
 		} catch (UnknownLeaseException | RemoteException | NullPointerException e) {
 			System.err.println("Failed to cancel MainMenuController lease(s)");
 		}
