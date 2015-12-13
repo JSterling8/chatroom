@@ -12,7 +12,6 @@ import net.jini.core.event.RemoteEventListener;
 import net.jini.core.event.UnknownEventException;
 import net.jini.space.AvailabilityEvent;
 
-//TODO Add to class diagram
 public class TopicUserRemovedRemoteEventListener implements RemoteEventListener {
 	private ChatroomController controller;
 	

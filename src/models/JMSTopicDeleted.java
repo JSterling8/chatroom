@@ -3,7 +3,6 @@ package models;
 import net.jini.core.entry.Entry;
 
 @SuppressWarnings("serial")
-//TODO Add to class diagram
 public class JMSTopicDeleted implements Entry {
 	public JMSTopic topic;
 	

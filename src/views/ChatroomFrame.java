@@ -36,7 +36,6 @@ public class ChatroomFrame extends JFrame {
 	private JTable usersTable;
 
 	public ChatroomFrame(JMSTopic topic, JMSUser user) {
-		// FIXME Create a "Message Owner" button.
 		this.controller = new ChatroomController(this, topic, user);
 
 		getContentPane().setLayout(new GridLayout(0, 1, 0, 0));
