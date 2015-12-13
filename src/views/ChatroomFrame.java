@@ -140,9 +140,7 @@ public class ChatroomFrame extends JFrame {
 	@Override
 	public void dispose() {
 		controller.handleWindowClose();
-	}
-	
-	public void superDispose(){
+		
 		super.dispose();
 	}
 

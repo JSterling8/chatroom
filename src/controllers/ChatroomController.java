@@ -209,10 +209,8 @@ public class ChatroomController implements Serializable {
 			userAddedRegistration.getLease().cancel();
 			userRemovedRegistration.getLease().cancel();
 		} catch (Exception e) {
-			System.err.println("Failed to remove TopicDeleted listener.");
-		}
-
-		frame.superDispose();
+			System.err.println("Failed to remove ChatroomController listener(s).");
+		}		
 	}
 
 	public void handlePrivateMessageSendPressed() {
