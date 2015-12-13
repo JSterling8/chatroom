@@ -19,7 +19,9 @@ public class TopicRemovedRemoteEventListener implements RemoteEventListener{
 	private ChatroomController chatroomController;
 	private boolean isChatroomController;
 	
-	public TopicRemovedRemoteEventListener(MainMenuController mainMenuController){
+	public TopicRemovedRemoteEventListener(MainMenuController mainMenuController) {
+		super();
+		
 		this.mainMenuController = mainMenuController;
 		this.isChatroomController = false;
 	}
