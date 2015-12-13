@@ -218,7 +218,7 @@ public class TopicService implements Serializable {
 
 	private boolean isValidTopic(JMSTopic topic) {
 		if (StringUtils.isNotBlank(topic.getBaseName()) && StringUtils.isNotBlank(topic.getName())
-				&& topic.getUsers() >= 1 && topic.getId() != null) {
+				&& topic.getId() != null) {
 			return true;
 		}
 

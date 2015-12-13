@@ -31,8 +31,8 @@ import models.JMSUser;
 import java.awt.event.ActionListener;
 
 public class MainMenuFrame extends JFrame {
-	public static final int COLUMN_INDEX_OF_TOPIC_ID = 4;
-	public static final int COLUMN_INDEX_OF_TOPIC_OWNER_ID = 3;
+	public static final int COLUMN_INDEX_OF_TOPIC_ID = 3;
+	public static final int COLUMN_INDEX_OF_TOPIC_OWNER_ID = 2;
 	
 	private static final long serialVersionUID = -1262155724457779827L;
 	
@@ -54,8 +54,8 @@ public class MainMenuFrame extends JFrame {
 
 		tableModel = controller.generateTopicTableModel();
 		JTable table = new JTable(tableModel);
+		table.removeColumn(table.getColumnModel().getColumn(COLUMN_INDEX_OF_TOPIC_ID));
 		table.removeColumn(table.getColumnModel().getColumn(COLUMN_INDEX_OF_TOPIC_OWNER_ID));
-		table.removeColumn(table.getColumnModel().getColumn(COLUMN_INDEX_OF_TOPIC_ID - 1));  // -1 is because index 4 becomes index 3 after the column in the line above is removed
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		// Makes cells non editable.

@@ -24,7 +24,7 @@ public class TopicRemoteEventListener implements RemoteEventListener, Serializab
 			AvailabilityEvent availEvent = (AvailabilityEvent) event;
 			JMSTopic topic = (JMSTopic) availEvent.getEntry();
 			
-			Object[] rowData = { topic.getName(), topic.getOwner().getName(), topic.getUsers(),
+			Object[] rowData = { topic.getName(), topic.getOwner().getName(),
 					topic.getOwner().getId(), topic.getId() };
 			
 			controller.getTopicTableModel().addRow(rowData);

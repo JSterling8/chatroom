@@ -41,7 +41,7 @@ public class TopicRemovedRemoteEventListener implements RemoteEventListener{
 			} else {
 				DefaultTableModel topicTableModel = mainMenuController.getTopicTableModel();
 				for(int i = 0; i < topicTableModel.getRowCount(); i++) {
-					UUID topicIdInTable = (UUID) topicTableModel.getValueAt(i, 4);
+					UUID topicIdInTable = (UUID) topicTableModel.getValueAt(i, 3);
 					JMSTopic topicRemoved = topicDeleted.getTopic();
 					UUID topicDeletedId = topicRemoved.getId();
 					

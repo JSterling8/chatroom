@@ -10,17 +10,15 @@ public class JMSTopic implements Entry {
 	public String name;
 	public String baseName;
 	public JMSUser owner;
-	public Integer users;
 
 	public JMSTopic() {
 
 	}
 
-	public JMSTopic(String name, JMSUser owner, Integer users) {
+	public JMSTopic(String name, JMSUser owner) {
 		this.id = UUID.randomUUID();
 		this.name = name;
 		this.owner = owner;
-		this.users = users;
 
 		setBaseName(name);
 	}
@@ -48,14 +46,6 @@ public class JMSTopic implements Entry {
 
 	public void setOwner(JMSUser owner) {
 		this.owner = owner;
-	}
-
-	public Integer getUsers() {
-		return users;
-	}
-
-	public void setUsers(Integer users) {
-		this.users = users;
 	}
 
 	public String getBaseName() {

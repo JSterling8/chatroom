@@ -128,7 +128,7 @@ public class MainMenuController {
 	}
 
 	public DefaultTableModel generateTopicTableModel() {
-		Object[] columns = { "Topic", "Owner", "User Count", "Owner ID", "Topic ID" };
+		Object[] columns = { "Topic", "Owner", "Owner ID", "Topic ID" };
 		List<JMSTopic> topics = topicService.getAllTopics();
 
 		Object[][] data = {};
@@ -138,9 +138,8 @@ public class MainMenuController {
 			for (int i = 0; i < topics.size(); i++) {
 				data[i][0] = topics.get(i).getName();
 				data[i][1] = topics.get(i).getOwner().getName();
-				data[i][2] = topics.get(i).getUsers();
-				data[i][3] = topics.get(i).getOwner().getId();
-				data[i][4] = topics.get(i).getId();
+				data[i][2] = topics.get(i).getOwner().getId();
+				data[i][3] = topics.get(i).getId();
 			}
 		}
 
@@ -178,7 +177,7 @@ public class MainMenuController {
 	}
 
 	private void createTopic(String name) {
-		JMSTopic topic = new JMSTopic(name, user, 1);
+		JMSTopic topic = new JMSTopic(name, user);
 
 		try {
 			topicService.createTopic(topic);
