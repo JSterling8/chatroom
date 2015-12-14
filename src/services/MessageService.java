@@ -197,7 +197,7 @@ public class MessageService implements Serializable {
 		try {
 			Transaction transaction = TransactionHelper.getTransaction(10000l);
 
-			// Read all of the topic's messages
+			// Take all of the topic's messages
 			EntryLookupHelper entryLookupHelper = new EntryLookupHelper();
 			entryLookupHelper.takeAllMatchingTemplate(space, template, transaction);
 
