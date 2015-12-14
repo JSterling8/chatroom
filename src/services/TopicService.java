@@ -204,6 +204,8 @@ public class TopicService implements Serializable {
 				deleteAllTopicUsers(topic, transaction);
 				MessageService.getMessageService().deleteAllTopicMessages(topic, transaction);
 
+				// Writes a JMSTopicDeleted object so listeners know the topic
+				// has been removed
 				space.write(new JMSTopicDeleted(topic), transaction, 1000l * 60l);
 
 				transaction.commit();
@@ -211,7 +213,7 @@ public class TopicService implements Serializable {
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Attempted to delete topic with null fields.  "
+			System.err.println("Attempted to delete topic with on or more null fields.  "
 					+ "Due to how JavaSpaces work, this will delete one at random and is not allowed.");
 		}
 	}
