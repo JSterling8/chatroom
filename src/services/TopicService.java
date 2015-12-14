@@ -21,6 +21,13 @@ import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
 import services.helper.TransactionHelper;
 
+/**
+ * A singleton that handles all interactions between a client and the JavaSpace
+ * for topics
+ * 
+ * @author Jonathan Sterling
+ *
+ */
 public class TopicService implements Serializable {
 	private static final long serialVersionUID = 4384471014207319215L;
 

@@ -13,6 +13,13 @@ import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace05;
 import services.helper.TransactionHelper;
 
+/**
+ * A singleton that handles all interactions between a client and the JavaSpace
+ * for users
+ * 
+ * @author Jonathan Sterling
+ *
+ */
 public class UserService {
 	private static final long NINETY_DAYS_IN_MILLIS = 1000l * 60l * 60l * 24l * 90l;
 
