@@ -20,6 +20,7 @@ import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionException;
+import net.jini.core.transaction.server.TransactionManager;
 import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
 import services.helper.TransactionHelper;
@@ -185,16 +186,27 @@ public class TopicService implements Serializable {
 		}
 	}
 
+	/**
+	 * Deletes a topic, including all of its messages and TopicUsers
+	 * 
+	 * @param topic
+	 *            The topic to delete
+	 */
 	public void deleteTopic(JMSTopic topic) {
 
+		// If the topic does not contain null fields
 		if (isValidTopic(topic)) {
 			try {
-				space.takeIfExists(topic, null, 3000);
+				Transaction transaction = TransactionHelper.getTransaction(10000l);
 
-				deleteAllTopicUsers(topic);
-				MessageService.getMessageService().deleteAllTopicMessages(topic);
+				space.takeIfExists(topic, transaction, 3000l);
 
-				space.write(new JMSTopicDeleted(topic), null, 1000l * 60l);
+				deleteAllTopicUsers(topic, transaction);
+				MessageService.getMessageService().deleteAllTopicMessages(topic, transaction);
+
+				space.write(new JMSTopicDeleted(topic), transaction, 1000l * 60l);
+				
+				transaction.commit();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -207,7 +219,8 @@ public class TopicService implements Serializable {
 	/**
 	 * Gets all users that are currently in a given topic.
 	 * 
-	 * @param topic The topic to get users for.
+	 * @param topic
+	 *            The topic to get users for.
 	 * 
 	 * @return All of the users in a given topic.
 	 */
@@ -216,34 +229,52 @@ public class TopicService implements Serializable {
 	}
 
 	/**
-	 * Removes all users from a given topic.
+	 * Adds a given user to a given topic.
 	 * 
-	 * @param topic A topic to remove all of the users from.
+	 * @param topic
+	 *            The topic to add the user to
+	 * @param user
+	 *            The user to add to the topic
 	 */
-	private void deleteAllTopicUsers(JMSTopic topic) {
-		JMSTopicUser template = new JMSTopicUser(topic);
-
-		try {
-			while (space.readIfExists(template, null, 1000) != null) {
-				space.takeIfExists(template, null, 1000);
-			}
-		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
-			System.err.println("Failed to delete all users from Topic entitled: '" + topic.getName() + "' with ID: '"
-					+ topic.getId().toString() + "'");
-			e.printStackTrace();
-		}
-	}
-
 	public void addTopicUser(JMSTopic topic, JMSUser user) {
 		JMSTopicUser topicUser = new JMSTopicUser(topic, user);
 
 		try {
+			Transaction transaction = TransactionHelper.getTransaction();
+
 			// Only create if the user isn't already in there...
-			if (space.readIfExists(topicUser, null, 1000) == null) {
-				space.write(topicUser, null, Lease.FOREVER);
+			if (space.readIfExists(topicUser, transaction, 1000) == null) {
+				space.write(topicUser, transaction, Lease.FOREVER);
 			}
+
+			transaction.commit();
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
 			System.err.println("Failed to add user to topic");
+			e.printStackTrace();
+		}
+	}
+
+	public void removeTopicUser(JMSTopic topic, JMSUser user) {
+		try {
+			Transaction transaction = TransactionHelper.getTransaction();
+			
+			boolean removed = false;
+			JMSTopicUser template = new JMSTopicUser(topic, user);
+
+			while (space.takeIfExists(template, transaction, 1000) != null) {
+				removed = true;
+			}
+
+			if (removed) {
+				JMSTopicUserRemoved removedTopicUser = new JMSTopicUserRemoved(template.getTopic(), template.getUser());
+
+				space.write(removedTopicUser, transaction, 1000l * 60l);
+			}
+			
+			transaction.commit();
+		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
+			System.err.println("Failed to remove user from topic.  " + "User ID: '" + user.getId().toString()
+					+ "' && Topic ID: '" + topic.getId().toString() + "'");
 			e.printStackTrace();
 		}
 	}
@@ -268,23 +299,24 @@ public class TopicService implements Serializable {
 		return false;
 	}
 
-	public void removeTopicUser(JMSTopic topic, JMSUser user) {
+	/**
+	 * Removes all users from a given topic.
+	 * 
+	 * @param topic
+	 *            A topic to remove all of the users from.
+	 * @param transaction
+	 *            The transaction in which to run the delete
+	 */
+	private void deleteAllTopicUsers(JMSTopic topic, Transaction transaction) {
+		JMSTopicUser template = new JMSTopicUser(topic);
+
 		try {
-			boolean removed = false;
-			JMSTopicUser template = new JMSTopicUser(topic, user);
-
-			while (space.takeIfExists(template, null, 1000) != null) {
-				removed = true;
-			}
-
-			if (removed) {
-				JMSTopicUserRemoved removedTopicUser = new JMSTopicUserRemoved(template.getTopic(), template.getUser());
-
-				space.write(removedTopicUser, null, 1000l * 60l);
+			while (space.readIfExists(template, transaction, 1000) != null) {
+				space.takeIfExists(template, transaction, 1000);
 			}
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
-			System.err.println("Failed to remove user from topic.  " + "User ID: '" + user.getId().toString()
-					+ "' && Topic ID: '" + topic.getId().toString() + "'");
+			System.err.println("Failed to delete all users from Topic entitled: '" + topic.getName() + "' with ID: '"
+					+ topic.getId().toString() + "'");
 			e.printStackTrace();
 		}
 	}

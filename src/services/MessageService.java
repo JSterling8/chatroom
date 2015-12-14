@@ -186,27 +186,21 @@ public class MessageService implements Serializable {
 	}
 
 	/**
-	 * Deletes all messages for a given topic
+	 * Deletes all messages for a given topic. 
+	 * 
+	 * <b>Transaction must be committed for this method to work</b>
 	 * 
 	 * @param topic
 	 *            The topic whose messages will be deleted
+	 * @param transaction
+	 * 			  The transaction in which the deletion will occur
 	 */
-	public void deleteAllTopicMessages(JMSTopic topic) {
+	public void deleteAllTopicMessages(JMSTopic topic, Transaction transaction) {
 		JMSMessage template = new JMSMessage(topic);
 
-		try {
-			Transaction transaction = TransactionHelper.getTransaction(10000l);
-
-			// Take all of the topic's messages
-			EntryLookupHelper entryLookupHelper = new EntryLookupHelper();
-			entryLookupHelper.takeAllMatchingTemplate(space, template, transaction);
-
-			// Commit the take all
-			transaction.commit();
-		} catch (RemoteException | TransactionException e) {
-			System.err.println("Failed to delete all topic messages");
-			e.printStackTrace();
-		}
+		// Take all of the topic's messages
+		EntryLookupHelper entryLookupHelper = new EntryLookupHelper();
+		entryLookupHelper.takeAllMatchingTemplate(space, template, transaction);
 	}
 
 	/**
