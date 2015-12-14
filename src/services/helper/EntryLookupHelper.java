@@ -17,7 +17,6 @@ public class EntryLookupHelper implements Serializable {
 
 	public EntryLookupHelper() {}
 
-	@SuppressWarnings("unchecked")
 	public <T extends Entry> List<T> findAllMatchingTemplate(JavaSpace05 space, T template) {		
 		Transaction transaction = TransactionHelper.getTransaction();
 

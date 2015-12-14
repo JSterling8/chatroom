@@ -22,14 +22,12 @@ public class MessageRemoteEventListener implements RemoteEventListener, Serializ
 	private static final long serialVersionUID = 7526472345622976341L;
 
 	private final ChatroomController controller;
-	private final JMSTopic topic;
 	private final JMSUser user;
 
 	public MessageRemoteEventListener(ChatroomController controller, JMSTopic topic, JMSUser user) {
 		super();
 
 		this.controller = controller;
-		this.topic = topic;
 		this.user = user;
 	}
 

@@ -10,7 +10,6 @@ import javax.naming.directory.InvalidAttributeValueException;
 import org.apache.commons.lang3.StringUtils;
 
 import exceptions.DuplicateEntryException;
-import exceptions.ResourceNotFoundException;
 import models.JMSTopic;
 import models.JMSTopicDeleted;
 import models.JMSTopicUser;
@@ -20,7 +19,6 @@ import net.jini.core.entry.UnusableEntryException;
 import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionException;
-import net.jini.core.transaction.server.TransactionManager;
 import net.jini.space.JavaSpace05;
 import services.helper.EntryLookupHelper;
 import services.helper.TransactionHelper;
