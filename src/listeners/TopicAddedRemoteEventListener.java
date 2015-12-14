@@ -37,7 +37,7 @@ public class TopicAddedRemoteEventListener implements RemoteEventListener, Seria
 
 			// Add the topic data to the MainMenuController's topic list.
 			Object[] rowData = { topic.getName(), topic.getOwner().getName(), topic.getOwner().getId(), topic.getId() };
-
+			
 			controller.getTopicTableModel().addRow(rowData);
 		} catch (Exception e) {
 			System.err.println("Failed to run notify method for Topic Creation");
