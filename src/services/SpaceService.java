@@ -12,7 +12,7 @@ import net.jini.space.JavaSpace05;
  * This is Dr. Gary Allen's SpaceUtils class, which I've renamed and made a few
  * tweaks to.
  * 
- * @author Gary Allen 
+ * @author Gary Allen
  *
  */
 public class SpaceService {
@@ -20,9 +20,18 @@ public class SpaceService {
 
 	private static JavaSpace05 space;
 
+	/**
+	 * Gets the JavaSpace for a given hostname
+	 * 
+	 * @param hostname
+	 *            The hostname to look for a JavaSpace on
+	 * 
+	 * @return A JavaSpace for a given hostname
+	 */
 	@SuppressWarnings("rawtypes")
 	public static JavaSpace05 getSpace(String hostname) {
-		if (space == null) {			
+		// Only get the space once...
+		if (space == null) {
 			try {
 				LookupLocator l = new LookupLocator("jini://" + hostname);
 
@@ -42,7 +51,13 @@ public class SpaceService {
 		return space;
 	}
 
-	public static JavaSpace05 getSpace() {		
+	/**
+	 * Determines if the application is being run at university of locally, then
+	 * gets the space accordingly
+	 * 
+	 * @return A JavaSpace
+	 */
+	public static JavaSpace05 getSpace() {
 		if (StringUtils.equals("wwwproxy.hud.ac.uk", proxyHost)) {
 			return getSpace("waterloo");
 		} else {
@@ -50,6 +65,14 @@ public class SpaceService {
 		}
 	}
 
+	/**
+	 * Gets a TransactionManager for a given hostname.
+	 * 
+	 * @param hostname
+	 *            The hostname to get a TransactionManager from.
+	 * 
+	 * @return A TransactionManager for a given hostname.
+	 */
 	@SuppressWarnings("rawtypes")
 	public static TransactionManager getManager(String hostname) {
 		if (System.getSecurityManager() == null) {
@@ -73,6 +96,12 @@ public class SpaceService {
 		return tm;
 	}
 
+	/**
+	 * Dynamically determines if the application is being run at university of
+	 * locally, and gets the TransactionManager accordingly
+	 * 
+	 * @return A TransactionManager
+	 */
 	public static TransactionManager getManager() {
 		if (StringUtils.equals("wwwproxy.hud.ac.uk", proxyHost)) {
 			return getManager("waterloo");
