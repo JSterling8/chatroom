@@ -18,6 +18,7 @@ import listeners.TopicAddedRemoteEventListener;
 import listeners.TopicRemovedRemoteEventListener;
 import models.JMSTopic;
 import models.JMSTopicDeleted;
+import models.JMSTopicUser;
 import models.JMSUser;
 import net.jini.core.event.EventRegistration;
 import net.jini.core.event.RemoteEventListener;
@@ -82,15 +83,25 @@ public class MainMenuController {
 	public void handleJoinTopicPressed(UUID topicId) {
 		JMSTopic topic = topicService.getTopicById(topicId);
 		if (topic != null) {
-			// If the topic the user wishes to join exists, open up a new
-			// ChatroomFrame for the topic
+			List<JMSTopicUser> topicUsers = topicService.getAllTopicUsers(topic);
+
+			// Check if this user already has a chat window open for this topic
+			for (JMSTopicUser topicUser : topicUsers) {
+				if (topicUser.getUser().equals(user)) {
+					JOptionPane.showMessageDialog(frame, "You are already in this topic");
+
+					return;
+				}
+			}
+
+			// If the topic the user wishes to join exists, and they're not
+			// already in it open up a new ChatroomFrame for the topic
 			new ChatroomFrame(topic, user);
 		} else {
 			// If the topic the user wishes to join does not exist, show an
 			// error
-			JOptionPane.showInternalMessageDialog(frame,
-					"Failed to Join Topic.  Please refresh the topic list and try again", "Failed to Join Topic",
-					JOptionPane.ERROR_MESSAGE, null);
+			JOptionPane.showMessageDialog(frame,
+					"Failed to Join Topic.  " + "Please refresh the topic list and try again");
 		}
 	}
 
@@ -198,13 +209,14 @@ public class MainMenuController {
 	/**
 	 * Gets all of the topics in the space and shows them to the user.
 	 * 
-	 * @param table A JTable to show the topics in.
+	 * @param table
+	 *            A JTable to show the topics in.
 	 */
 	public void updateTopicList(JTable table) {
 		tableModel = generateTopicTableModel();
 		table.setModel(tableModel);
+		table.removeColumn(table.getColumnModel().getColumn(MainMenuFrame.COLUMN_INDEX_OF_TOPIC_ID));
 		table.removeColumn(table.getColumnModel().getColumn(MainMenuFrame.COLUMN_INDEX_OF_TOPIC_OWNER_ID));
-		table.removeColumn(table.getColumnModel().getColumn(MainMenuFrame.COLUMN_INDEX_OF_TOPIC_ID - 1));
 	}
 
 	/**
@@ -257,11 +269,12 @@ public class MainMenuController {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Creates a topic with a given name.
 	 * 
-	 * @param name The desired name of the topic to create.
+	 * @param name
+	 *            The desired name of the topic to create.
 	 */
 	private void createTopic(String name) {
 		JMSTopic topic = new JMSTopic(name, user);

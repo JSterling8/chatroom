@@ -171,7 +171,7 @@ public class MainMenuFrame extends JFrame {
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(850, 550));
-		setTitle("Main Menu");
+		setTitle("Main Menu - Logged In As: " + user.getName());
 		setVisible(true);
 	}
 

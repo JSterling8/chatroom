@@ -16,13 +16,10 @@ import net.jini.space.JavaSpace05;
  *
  */
 public class SpaceService {
-	private static JavaSpace05 space;
 	private static final String proxyHost = System.getProperties().getProperty("http.proxyHost");
 
-	public static void addCodeBaseFor(Class<?> clazz) {
-	    System.setProperty("java.rmi.server.codebase", clazz.getProtectionDomain().getCodeSource().getLocation().toString());
-	}
-	
+	private static JavaSpace05 space;
+
 	@SuppressWarnings("rawtypes")
 	public static JavaSpace05 getSpace(String hostname) {
 		if (space == null) {			
