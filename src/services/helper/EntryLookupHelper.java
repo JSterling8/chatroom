@@ -65,6 +65,22 @@ public class EntryLookupHelper implements Serializable {
 		return entries;
 	}
 	
+	public <T extends Entry> List<T> takeAllMatchingTemplate(JavaSpace05 space, T template) {		
+		Transaction transaction = TransactionHelper.getTransaction();
+
+		List<T> entries = takeAllMatchingTemplate(space, template, transaction);
+		
+		try {
+			transaction.commit();
+		} catch (UnknownTransactionException | CannotCommitException | RemoteException e) {
+			System.err.println("Failed to commit transaction.");
+			
+			e.printStackTrace();
+		}
+		
+		return entries;
+	}
+	
 	/**
 	 * <b>Does not commit transaction</b>
 	 * 
