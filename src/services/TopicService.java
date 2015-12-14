@@ -205,7 +205,7 @@ public class TopicService implements Serializable {
 				MessageService.getMessageService().deleteAllTopicMessages(topic, transaction);
 
 				space.write(new JMSTopicDeleted(topic), transaction, 1000l * 60l);
-				
+
 				transaction.commit();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -242,7 +242,7 @@ public class TopicService implements Serializable {
 		try {
 			Transaction transaction = TransactionHelper.getTransaction();
 
-			// Only create if the user isn't already in there...
+			// Only add the TopicUser if it isn't already in there...
 			if (space.readIfExists(topicUser, transaction, 1000) == null) {
 				space.write(topicUser, transaction, Lease.FOREVER);
 			}
@@ -254,23 +254,37 @@ public class TopicService implements Serializable {
 		}
 	}
 
+	/**
+	 * Removes a given user from a given topic
+	 * 
+	 * @param topic
+	 *            The topic to remove the user from
+	 * @param user
+	 *            The user to remove from the topic
+	 */
 	public void removeTopicUser(JMSTopic topic, JMSUser user) {
 		try {
 			Transaction transaction = TransactionHelper.getTransaction();
-			
+
 			boolean removed = false;
 			JMSTopicUser template = new JMSTopicUser(topic, user);
 
+			// If the space is in a bad state and has duplicate users in a
+			// topic, this while loop ensures they are all removed
 			while (space.takeIfExists(template, transaction, 1000) != null) {
 				removed = true;
 			}
 
+			// Put a JMSTopicUserRemoved object in the space so listeners can
+			// pick them up and remove them from other user's lists
 			if (removed) {
 				JMSTopicUserRemoved removedTopicUser = new JMSTopicUserRemoved(template.getTopic(), template.getUser());
 
+				// Writes the JMSTopicUserRemoved with a 60 second lease, so
+				// listeners have 60 seconds to act on it
 				space.write(removedTopicUser, transaction, 1000l * 60l);
 			}
-			
+
 			transaction.commit();
 		} catch (RemoteException | UnusableEntryException | TransactionException | InterruptedException e) {
 			System.err.println("Failed to remove user from topic.  " + "User ID: '" + user.getId().toString()
@@ -279,6 +293,17 @@ public class TopicService implements Serializable {
 		}
 	}
 
+	/**
+	 * Whether or not a topic already exists in the space with the same base
+	 * name or UUID.
+	 * 
+	 * @param topic
+	 *            The topic to check if exists
+	 * @param transaction
+	 *            The transaction in which the check will take place
+	 * @return <code>true</code> if a match by either base name or UUID,
+	 *         otherwise <code>false</code>
+	 */
 	private boolean topicExistsInSpace(JMSTopic topic, Transaction transaction) {
 		try {
 			JMSTopic template = new JMSTopic();
@@ -321,6 +346,14 @@ public class TopicService implements Serializable {
 		}
 	}
 
+	/**
+	 * Checks if a topic has any null unique identifiers (base name, name, and
+	 * UUID)
+	 * 
+	 * @param topic
+	 * @return <code>true</code> if any unique identifier is null, otherwise
+	 *         <code>false</code>
+	 */
 	private boolean isValidTopic(JMSTopic topic) {
 		if (StringUtils.isNotBlank(topic.getBaseName()) && StringUtils.isNotBlank(topic.getName())
 				&& topic.getId() != null) {
