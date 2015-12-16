@@ -185,8 +185,9 @@ public class MainMenuController {
 	public void logout() {
 		cancelLeases();
 		removeUserFromAllTopics();
-		
-		// Hide this window so its overridden dispose method isn't called.
+
+		// Hide this window so its overridden dispose method isn't called (this
+		// would cause an infinite loop)		
 		frame.setVisible(false);
 		disposeAllVisibleWindows();
 
@@ -201,10 +202,12 @@ public class MainMenuController {
 	 * closes all open windows, then exists the application.
 	 */
 	public void handleDispose() {
-		frame.setVisible(false);
-
 		cancelLeases();
 		removeUserFromAllTopics();
+
+		// Hide this window so its overridden dispose method isn't called (this
+		// would cause an infinite loop)
+		frame.setVisible(false);
 		disposeAllVisibleWindows();
 
 		System.exit(0);
