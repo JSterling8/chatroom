@@ -197,7 +197,7 @@ public class MainMenuFrame extends JFrame {
 								.addComponent(btnLogout).addContainerGap()));
 		menuButtonsPanel.setLayout(rightMenuPanelGroupLayout);
 
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(new Dimension(850, 550));
 		setTitle("Main Menu - Logged In As: " + user.getName());
 		setVisible(true);
@@ -208,13 +208,19 @@ public class MainMenuFrame extends JFrame {
 	}
 
 	/**
-	 * Overrides JFrame's dispose method to cancel the listener leases, then
-	 * disposes of the frame
+	 * Overrides JFrame's add controllers custom disposing before closing the
+	 * window
 	 */
 	@Override
 	public void dispose() {
-		controller.cancelLeases();
+		controller.handleDispose();
+	}
 
+	/**
+	 * Provides a means for external classes to call this classes parent's
+	 * dispose method
+	 */
+	public void superDispose() {
 		super.dispose();
 	}
 
@@ -244,7 +250,7 @@ public class MainMenuFrame extends JFrame {
 	 * A custom selection handler for the topics list. When a row is
 	 * highlighted, it checks to see if the user owns that topic, and enables
 	 * the delete button if they do. If they don't own the topic, it ensures the
-	 * delete button is disabled.  It also enables the "Join Topic" button.
+	 * delete button is disabled. It also enables the "Join Topic" button.
 	 * 
 	 * @author Jonathan Sterling
 	 *

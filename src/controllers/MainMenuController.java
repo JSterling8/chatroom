@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -182,43 +183,71 @@ public class MainMenuController {
 	 * closes the main menu, and opens a new login window
 	 */
 	public void logout() {
-		// Close all of the windows
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				Frame[] frames = Frame.getFrames();
+		frame.setVisible(false);
 
-				for (Frame frame : frames) {
-					if (frame.isVisible()) {
-						frame.setVisible(false);
-						frame.dispose();
-					}
-				}
+		cancelLeases();
+		removeUserFromAllTopics();
+		disposeAllWindows();
 
-				new LoginFrame();
+		frame.superDispose();
+
+		new LoginFrame();
+	}
+
+	/**
+	 * When a user closes the main menu, this method cancels the main menu
+	 * listener leases, removes the user from any topic they're currently in,
+	 * closes all open windows, then exists the application.
+	 */
+	public void handleDispose() {
+		frame.setVisible(false);
+
+		cancelLeases();
+		removeUserFromAllTopics();
+		disposeAllWindows();
+
+		System.exit(0);
+	}
+
+	/**
+	 * Disposes all visible windows
+	 */
+	private void disposeAllWindows() {
+
+		Frame[] frames = Frame.getFrames();
+
+		for (Frame frame : frames) {
+			if (frame.isVisible()) {
+				frame.setVisible(false);
+				frame.dispose();
 			}
-		});
-
-		// Remove user from all topics, if they're in them. This is effectively
-		// so if a user crashes out, they can reset their state in all topics by
-		// logging in then back out again
-		EntryLookupHelper lookupHelper = new EntryLookupHelper();
-		JMSTopicUser thisUser = new JMSTopicUser();
-		thisUser.setUser(user);
-		List<JMSTopicUser> topicUsers = lookupHelper.findAllMatchingTemplate(SpaceService.getSpace(), thisUser);
-		for (JMSTopicUser topicUser : topicUsers) {
-			TopicService.getTopicService().removeTopicUser(topicUser.getTopic(), topicUser.getUser());
 		}
 	}
 
 	/**
 	 * Removes the topic added/deleted listeners from the space.
 	 */
-	public void cancelLeases() {
+	private void cancelLeases() {
 		try {
 			topicAddedRegistration.getLease().cancel();
 			topicRemovedRegistration.getLease().cancel();
 		} catch (UnknownLeaseException | RemoteException | NullPointerException e) {
 			System.err.println("Failed to cancel MainMenuController lease(s)");
+		}
+	}
+
+	/**
+	 * Remove user from all topics, if they're in any. This is effectively so if
+	 * a user crashes out, they can reset their state in all topics by logging
+	 * in then back out again.
+	 */
+	private void removeUserFromAllTopics() {
+		EntryLookupHelper lookupHelper = new EntryLookupHelper();
+		JMSTopicUser thisUser = new JMSTopicUser();
+		thisUser.setUser(user);
+		List<JMSTopicUser> topicUsers = lookupHelper.findAllMatchingTemplate(SpaceService.getSpace(), thisUser);
+		for (JMSTopicUser topicUser : topicUsers) {
+			TopicService.getTopicService().removeTopicUser(topicUser.getTopic(), topicUser.getUser());
 		}
 	}
 
