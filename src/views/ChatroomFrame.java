@@ -159,6 +159,10 @@ public class ChatroomFrame extends JFrame {
 		return tfMessageInput;
 	}
 
+	/**
+	 * Adds to default dispose() behaviour. Notifies controller of window close
+	 * and handles it accordingly
+	 */
 	@Override
 	public void dispose() {
 		controller.handleWindowClose();
@@ -169,9 +173,6 @@ public class ChatroomFrame extends JFrame {
 	/**
 	 * A list selection handler for the Users List. Detects when a name has been
 	 * clicked and records the index that is selected
-	 * 
-	 * @author Jonathan Sterling
-	 *
 	 */
 	private class SharedUserListSelectionHandler implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent e) {
