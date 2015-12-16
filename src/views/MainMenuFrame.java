@@ -91,16 +91,21 @@ public class MainMenuFrame extends JFrame {
 				}
 			}
 		});
+		// Adds listener for the enter key being pressed
 		createKeyBindings(topicsTable);
 
+		// Create a scrollpane, put the topics table in it, and add it to the
+		// base panel
 		JScrollPane scrollPane = new JScrollPane(topicsTable);
 		scrollPane.setBounds(0, 0, 630, 503);
 		basePanel.add(scrollPane);
 
-		JPanel panel_1 = new JPanel();
-		panel_1.setBounds(640, 0, 192, 503);
-		basePanel.add(panel_1);
+		// Create a panel for the menu buttons and add it to the base panel
+		JPanel menuButtonsPanel = new JPanel();
+		menuButtonsPanel.setBounds(640, 0, 192, 503);
+		basePanel.add(menuButtonsPanel);
 
+		// Create the Create, Join, Delete, Refresh, and Logout buttons
 		JButton btnCreateTopic = new JButton("Create Topic");
 		btnCreateTopic.addMouseListener(new MouseAdapter() {
 			@Override
@@ -115,10 +120,14 @@ public class MainMenuFrame extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				int selectedRow = topicsTable.getSelectedRow();
 				if (selectedRow == -1) {
+					// If Join Topic is clicked but no topic is selected, show
+					// an error
 					JOptionPane.showInternalMessageDialog(MainMenuFrame.this,
 							"Failed to join topic.  " + "No topic selected", "Join Failed", JOptionPane.ERROR_MESSAGE,
 							null);
 				} else {
+					// If join topic is clicked with a valid topic highlighted,
+					// ask the controller to handle the button press
 					UUID topicIdToJoin = (UUID) topicsTableModel.getValueAt(selectedRow, COLUMN_INDEX_OF_TOPIC_ID);
 					controller.handleJoinTopicPressed(topicIdToJoin);
 				}
@@ -141,6 +150,8 @@ public class MainMenuFrame extends JFrame {
 				}
 			}
 		});
+		// Defaults to disabled because no topic is selected when the window is
+		// initially created
 		btnDeleteTopic.setEnabled(false);
 
 		JButton btnLogout = new JButton("Logout");
@@ -151,34 +162,40 @@ public class MainMenuFrame extends JFrame {
 			}
 		});
 
+		// A button to manually refresh the topic list. This is a legacy item
+		// from before listeners were implemented. It's here purely to give the
+		// user a feeling of control over the topic list
 		JButton btnRefreshList = new JButton("Refresh List");
 		btnRefreshList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				controller.updateTopicList(topicsTable);
 			}
 		});
-		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
-		gl_panel_1
+
+		// Some monstrosity that WindowBuilder generated
+		// Makes the right menu bar layout look pretty
+		GroupLayout rightMenuPanelGroupLayout = new GroupLayout(menuButtonsPanel);
+		rightMenuPanelGroupLayout
 				.setHorizontalGroup(
-						gl_panel_1.createParallelGroup(Alignment.TRAILING)
-								.addGroup(
-										gl_panel_1.createSequentialGroup().addContainerGap()
-												.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-														.addComponent(btnDeleteTopic, GroupLayout.DEFAULT_SIZE, 168,
-																Short.MAX_VALUE)
-												.addComponent(btnLogout, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
-												.addComponent(btnCreateTopic, GroupLayout.DEFAULT_SIZE, 168,
+						rightMenuPanelGroupLayout.createParallelGroup(Alignment.TRAILING)
+								.addGroup(rightMenuPanelGroupLayout.createSequentialGroup().addContainerGap()
+										.addGroup(rightMenuPanelGroupLayout.createParallelGroup(Alignment.LEADING)
+												.addComponent(btnDeleteTopic, GroupLayout.DEFAULT_SIZE, 168,
 														Short.MAX_VALUE)
-						.addComponent(btnJoinTopic, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
-						.addComponent(btnRefreshList, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))
-				.addContainerGap()));
-		gl_panel_1.setVerticalGroup(gl_panel_1.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING,
-				gl_panel_1.createSequentialGroup().addContainerGap().addComponent(btnRefreshList)
-						.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnCreateTopic)
-						.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnJoinTopic)
-						.addPreferredGap(ComponentPlacement.RELATED, 331, Short.MAX_VALUE).addComponent(btnDeleteTopic)
-						.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnLogout).addContainerGap()));
-		panel_1.setLayout(gl_panel_1);
+										.addComponent(btnLogout, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+										.addComponent(btnCreateTopic, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+										.addComponent(btnJoinTopic, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+										.addComponent(btnRefreshList, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))
+						.addContainerGap()));
+		rightMenuPanelGroupLayout.setVerticalGroup(
+				rightMenuPanelGroupLayout.createParallelGroup(Alignment.LEADING).addGroup(Alignment.TRAILING,
+						rightMenuPanelGroupLayout.createSequentialGroup().addContainerGap().addComponent(btnRefreshList)
+								.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnCreateTopic)
+								.addPreferredGap(ComponentPlacement.RELATED).addComponent(btnJoinTopic)
+								.addPreferredGap(ComponentPlacement.RELATED, 331, Short.MAX_VALUE)
+								.addComponent(btnDeleteTopic).addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(btnLogout).addContainerGap()));
+		menuButtonsPanel.setLayout(rightMenuPanelGroupLayout);
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(850, 550));
@@ -190,6 +207,10 @@ public class MainMenuFrame extends JFrame {
 		return controller;
 	}
 
+	/**
+	 * Overrides JFrame's dispose method to cancel the listener leases, then
+	 * disposes of the frame
+	 */
 	@Override
 	public void dispose() {
 		controller.cancelLeases();
@@ -197,6 +218,14 @@ public class MainMenuFrame extends JFrame {
 		super.dispose();
 	}
 
+	/**
+	 * Effectively adds a listener for the enter key for the topics table. If
+	 * enter is pressed, the same functionality as clicking the join button is
+	 * implemented
+	 * 
+	 * @param table
+	 *            The table to add the enter-key listener to
+	 */
 	@SuppressWarnings("serial")
 	private void createKeyBindings(JTable table) {
 		table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
@@ -211,6 +240,15 @@ public class MainMenuFrame extends JFrame {
 		});
 	}
 
+	/**
+	 * A custom selection handler for the topics list. When a row is
+	 * highlighted, it checks to see if the user owns that topic, and enables
+	 * the delete button if they do. If they don't own the topic, it ensures the
+	 * delete button is disabled.  It also enables the "Join Topic" button.
+	 * 
+	 * @author Jonathan Sterling
+	 *
+	 */
 	private class TopicListSelectionHandler implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent e) {
 			ListSelectionModel lsm = (ListSelectionModel) e.getSource();
