@@ -422,7 +422,7 @@ public class TopicServiceTest {
 			assertTrue(topicService.getAllTopics().size() == initialNumOfTopics + numTopicsToAdd);
 			
 			JavaSpace05 space = SpaceService.getSpace();
-			for(int i = 0; i < numTopicsToAdd; i++) {
+			for(int i = 0; i < numTopicsToRemove; i++) {
 				space.takeIfExists(template, null, 500l);
 			}
 			
