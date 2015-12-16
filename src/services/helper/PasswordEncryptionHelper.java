@@ -59,13 +59,17 @@ public class PasswordEncryptionHelper {
 	 * Given a password, salt, iteration #, and byte #, returns a byte array
 	 * containing the encrypted password
 	 * 
-	 * @param password The password to encrypt
-	 * @param salt The salt to use to encrypt the password
-	 * @param iterations The iteration count
+	 * @param password
+	 *            The password to encrypt
+	 * @param salt
+	 *            The salt to use to encrypt the password
+	 * @param iterations
+	 *            The iteration count
 	 * @param bytes
-	 * @return
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
+	 *            The number of bytes to use for the encrypted password
+	 *            (key_length/8)
+	 * 
+	 * @return A byte array containing the encrypted password
 	 */
 	private static byte[] createHash(char[] password, byte[] salt, int iterations, int bytes)
 			throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -75,6 +79,18 @@ public class PasswordEncryptionHelper {
 		return secretKeyFactory.generateSecret(keySpec).getEncoded();
 	}
 
+	/**
+	 * Takes in a non-encrypted password and checks if it equals a given
+	 * encrypted password
+	 * 
+	 * @param password
+	 *            A non-encrypted password
+	 * @param goodHash
+	 *            An encrypted password
+	 * 
+	 * @return <code>true</code> if the non-encrypted password, when encrypted,
+	 *         is equal to the encrypted password
+	 */
 	public static boolean validatePassword(char[] password, String goodHash)
 			throws NoSuchAlgorithmException, InvalidKeySpecException {
 		// Decode the hash into its 3 parameters
@@ -91,6 +107,17 @@ public class PasswordEncryptionHelper {
 		return slowEquals(hash, testHash);
 	}
 
+	/**
+	 * Checks if two byte arrays are equal
+	 * 
+	 * @param a
+	 *            The first byte array
+	 * @param b
+	 *            The second byte array
+	 * 
+	 * @return <code>true</code> if the byte array's contents are 100% equal,
+	 *         otherwise <code>false</code>
+	 */
 	private static boolean slowEquals(byte[] a, byte[] b) {
 		int diff = a.length ^ b.length;
 
@@ -101,6 +128,14 @@ public class PasswordEncryptionHelper {
 		return diff == 0;
 	}
 
+	/**
+	 * Converts hex to a byte array
+	 * 
+	 * @param hex
+	 *            The hex to convert
+	 * 
+	 * @return The byte array equivalent of the given hex value
+	 */
 	private static byte[] fromHex(String hex) {
 		byte[] binary = new byte[hex.length() / 2];
 		for (int i = 0; i < binary.length; i++) {
@@ -109,6 +144,13 @@ public class PasswordEncryptionHelper {
 		return binary;
 	}
 
+	/**
+	 * Converts a given byte array to hex
+	 * 
+	 * @param array
+	 *            The byte array to convert to hex
+	 * @return The hex equivalent of the given byte array
+	 */
 	private static String toHex(byte[] array) {
 		BigInteger bi = new BigInteger(1, array);
 		String hex = bi.toString(16);
