@@ -10,6 +10,7 @@ import exceptions.DuplicateEntryException;
 import exceptions.ResourceNotFoundException;
 import models.JMSUser;
 import net.jini.core.entry.UnusableEntryException;
+import net.jini.core.lease.Lease;
 import net.jini.core.transaction.Transaction;
 import net.jini.core.transaction.TransactionException;
 import net.jini.space.JavaSpace05;
@@ -72,6 +73,18 @@ public class UserService {
 		}
 
 		return true;
+	}
+	
+	/**
+	 * Used for testing and ensuring space isn't left cluttered. Returns lease
+	 * so it can be removed easily from the space.  No validity checks are made
+	 * 
+	 * @param user The user to write to the space
+	 * @return The topic's lease
+	 */
+	public Lease createDebugUser(JMSUser user) throws RemoteException, TransactionException {
+		long oneMinuteInMillis = 1000l * 60l;
+		return space.write(user, null, oneMinuteInMillis);
 	}
 
 	/**

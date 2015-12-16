@@ -107,7 +107,9 @@ public class MessageService implements Serializable {
 	 *             Thrown if the Topic the user wishes to send a message in does
 	 *             not exist
 	 */
-	public void sendMessage(JMSMessage message) throws ResourceNotFoundException, RemoteException {
+	public Lease sendMessage(JMSMessage message) throws ResourceNotFoundException, RemoteException {
+		Lease messageLease = null;
+		
 		try {
 			if (message.getTopic() == null) {
 				throw new ResourceNotFoundException("Message does not have required field: topic");
@@ -120,7 +122,7 @@ public class MessageService implements Serializable {
 			if (topicService.doesTopicExistInSpace(message.getTopic(), transaction)) {
 				// If the message is public, just write it to the space
 				if (message.getTo() == null) {
-					space.write(message, transaction, Lease.FOREVER);
+					messageLease = space.write(message, transaction, Lease.FOREVER);
 				} else {
 					// This check is here to guard against a wildcard match when
 					// we later check to see if the user the message is being
@@ -143,7 +145,7 @@ public class MessageService implements Serializable {
 
 					// If the checks have all passed, write the message to the
 					// space
-					space.write(message, transaction, Lease.FOREVER);
+					messageLease = space.write(message, transaction, Lease.FOREVER);
 				}
 
 				// We need to commit the transaction or nothing will happen.
@@ -164,6 +166,8 @@ public class MessageService implements Serializable {
 
 			throw new RemoteException("Failed to write message to JavaSpace.  Server error.");
 		}
+		
+		return messageLease;
 	}
 
 	/**

@@ -100,6 +100,19 @@ public class TopicService implements Serializable {
 	}
 
 	/**
+	 * Used for testing and ensuring space isn't left cluttered. Returns lease
+	 * so it can be removed easily from the space.  No validity checks are made
+	 * 
+	 * @param topic The topic to create
+	 * @return The topic's lease
+	 */
+	public Lease createDebugTopic(JMSTopic topic) throws RemoteException, TransactionException {
+		long oneMinuteInMillis = 1000l * 60l;
+
+		return space.write(topic, null, oneMinuteInMillis);
+	}
+
+	/**
 	 * Gets all of the topics in the space.
 	 * 
 	 * @return All of the topics in the space.
@@ -253,6 +266,18 @@ public class TopicService implements Serializable {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Used for testing and ensuring space isn't left cluttered. Returns lease
+	 * so it can be removed easily from the space.  No validity checks are made
+	 * 
+	 * @param topic The topic to create a JMSTopicUser for
+	 * @param user User to create JMSTopicUser for
+	 * @return The JMSTopicUser's lease
+	 */
+	public Lease addDebugTopicUser(JMSTopic topic, JMSUser user) throws RemoteException, TransactionException {
+		return space.write(new JMSTopicUser(topic, user), null, 60l * 1000l);
+	}
 
 	/**
 	 * Removes a given user from a given topic
@@ -355,8 +380,7 @@ public class TopicService implements Serializable {
 	 *         <code>false</code>
 	 */
 	private boolean isValidTopic(JMSTopic topic) {
-		if (StringUtils.isNotBlank(topic.getBaseName()) && StringUtils.isNotBlank(topic.getName())
-				&& topic.getId() != null) {
+		if (topic.getBaseName() != null && StringUtils.isNotBlank(topic.getName()) && topic.getId() != null) {
 			return true;
 		}
 

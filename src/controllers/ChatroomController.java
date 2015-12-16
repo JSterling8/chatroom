@@ -198,7 +198,8 @@ public class ChatroomController implements Serializable {
 	}
 
 	/**
-	 * Removes the user from the topic and cancels all event registration leases
+	 * Removes the user from the topic, cancels all event registration leases,
+	 * and closes the frame
 	 */
 	public void handleWindowClose() {
 		topicService.removeTopicUser(topic, user);
@@ -210,7 +211,7 @@ public class ChatroomController implements Serializable {
 		} catch (Exception e) {
 			System.err.println("Failed to remove ChatroomController listener(s).");
 		}
-		
+
 		frame.superDispose();
 	}
 
