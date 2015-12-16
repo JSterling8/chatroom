@@ -210,6 +210,8 @@ public class ChatroomController implements Serializable {
 		} catch (Exception e) {
 			System.err.println("Failed to remove ChatroomController listener(s).");
 		}
+		
+		frame.superDispose();
 	}
 
 	/**

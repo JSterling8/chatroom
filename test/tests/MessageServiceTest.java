@@ -20,20 +20,12 @@ import services.SpaceService;
 import services.helper.EntryLookupHelper;
 
 public class MessageServiceTest {
-
-	// Null topics cannot have messages sent
-	// Get all messages for user
-	// Check pm to another user not visible to user who didn't send it
-	// Check pm visible to from user
-	// Check pm visible to to user
-	// Check messages in correct order
-	// Check pm only to user who is currently in topic
-
 	private JavaSpace05 space;
 	private EntryLookupHelper lookupHelper;
 	private JMSUser user;
 	private JMSTopic topic;
 	private JMSMessage message;
+	private MessageService messageService;
 	
 	@Before
 	public void setup() {
@@ -44,6 +36,7 @@ public class MessageServiceTest {
 		message = new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), "sfsdf");
 		
 		space = SpaceService.getSpace();
+		messageService = MessageService.getMessageService();
 		lookupHelper = new EntryLookupHelper();
 	}
 	
@@ -56,8 +49,6 @@ public class MessageServiceTest {
 	
 	@Test
 	public void checkNonExistantTopicCantHaveMessageSent() {
-		MessageService messageService = MessageService.getMessageService();
-
 		boolean failedAsExpected = false;
 		try {
 			messageService.sendMessage(message);
@@ -70,4 +61,27 @@ public class MessageServiceTest {
 		assertTrue("Expected exception was not thrown. Users should not be able to send messages "
 				+ "in topics that don't exist in the space", failedAsExpected);
 	}
+	
+	// Null topics cannot have messages sent
+	@Test
+	public void checkNullTopicCantHaveMessageSent() {
+		boolean failedAsExpected = false;
+		try {
+			messageService.sendMessage(message);
+		} catch (RemoteException e) {
+			failedAsExpected = false;
+		} catch (ResourceNotFoundException e) {
+			failedAsExpected = true;
+		}
+
+		assertTrue("Expected exception was not thrown. Users should not be able to send messages "
+				+ "in topics that don't exist in the space", failedAsExpected);
+	}
+	
+	// Get all messages for user
+	// Check pm to another user not visible to user who didn't send it
+	// Check pm visible to from user
+	// Check pm visible to to user
+	// Check messages in correct order
+	// Check pm only to user who is currently in topic
 }

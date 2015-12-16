@@ -166,7 +166,12 @@ public class ChatroomFrame extends JFrame {
 	@Override
 	public void dispose() {
 		controller.handleWindowClose();
+	}
 
+	/**
+	 * Allows external classes to access this class's parent's dispose() method
+	 */
+	public void superDispose() {
 		super.dispose();
 	}
 
