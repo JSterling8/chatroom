@@ -60,19 +60,21 @@ public class UserService {
 	 * @throws TransactionException
 	 * @throws DuplicateEntryException
 	 */
-	public boolean createUser(JMSUser user) throws RemoteException, TransactionException, DuplicateEntryException {
+	public Lease createUser(JMSUser user) throws RemoteException, TransactionException, DuplicateEntryException {
+		Lease lease = null;
+		
 		isValidUser(user);
 
 		Transaction transaction = TransactionHelper.getTransaction();
 
 		if (getUserByBaseName(user.getBaseName(), transaction) == null) {
-			space.write(user, transaction, NINETY_DAYS_IN_MILLIS);
+			lease = space.write(user, transaction, NINETY_DAYS_IN_MILLIS);
 			transaction.commit();
 		} else {
 			throw new DuplicateEntryException("User with name: '" + user.getName() + "' already exists.");
 		}
 
-		return true;
+		return lease;
 	}
 	
 	/**
@@ -98,7 +100,9 @@ public class UserService {
 	 * @throws InvalidAttributeValueException
 	 *             Thrown if the JMSUser object is invalid
 	 */
-	public void renewUserLease(JMSUser user) throws ResourceNotFoundException, InvalidAttributeValueException {
+	public Lease renewUserLease(JMSUser user) throws ResourceNotFoundException, InvalidAttributeValueException {
+		Lease lease = null;
+		
 		if (isValidUser(user)) {
 			Transaction transaction = TransactionHelper.getTransaction();
 
@@ -107,7 +111,7 @@ public class UserService {
 			if (userFromSpace != null) {
 				try {
 					space.takeIfExists(userFromSpace, transaction, 1000);
-					space.write(user, transaction, NINETY_DAYS_IN_MILLIS);
+					lease = space.write(user, transaction, NINETY_DAYS_IN_MILLIS);
 					transaction.commit();
 				} catch (RemoteException | TransactionException | InterruptedException | UnusableEntryException e) {
 					System.err.println("Failed to renew user's lease");
@@ -119,6 +123,8 @@ public class UserService {
 		} else {
 			throw new InvalidAttributeValueException("JMSUser object contains one or more null fields");
 		}
+		
+		return lease;
 	}
 
 	/**
@@ -172,8 +178,7 @@ public class UserService {
 	 * @return The base name of a given name
 	 */
 	public String getBaseNameFromName(String name) {
-		String baseName = name;
-		baseName = baseName.replaceAll("[^A-Za-z0-9]", "");
+		String baseName = name.replaceAll("[^A-Za-z0-9]", "");
 		baseName = baseName.toUpperCase();
 
 		return baseName;

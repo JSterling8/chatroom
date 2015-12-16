@@ -111,7 +111,6 @@ public class TopicServiceTest {
 		// Using a 50 character random name here to avoid collision with
 		// existing name. With 50 characters, the collision chance is
 		// 1 / (26^50)
-
 		String randomName = RandomStringUtils.randomAlphabetic(50);
 		JMSTopic topic = new JMSTopic(randomName, aUser);
 		JMSTopic topicDupe = new JMSTopic(randomName, aUser);
