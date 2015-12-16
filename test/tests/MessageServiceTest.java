@@ -52,9 +52,12 @@ public class MessageServiceTest {
 	public void teardown() {
 		for (Lease lease : leases) {
 			try {
-				lease.cancel();
+				if(lease != null){
+					lease.cancel();
+				}
 			} catch (UnknownLeaseException | RemoteException e) {
-				// Ignore...
+				System.err.println("Failed to cancel lease on test entry.  "
+						+ "Most only have a lease of 60 seconds, so it may have just expired");
 			}
 		}
 	}

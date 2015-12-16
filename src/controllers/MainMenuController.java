@@ -2,6 +2,7 @@ package controllers;
 
 import java.awt.Frame;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,8 +69,8 @@ public class MainMenuController {
 	public void handleCreateButtonPressed() {
 		// Ask the user for a topic name.
 		String topicName = JOptionPane.showInputDialog(frame, "Enter a topic name: ");
-		
-		if(topicName.replaceAll("[^A-Za-z0-9]", "").length() == 0) {
+
+		if (topicName.replaceAll("[^A-Za-z0-9]", "").length() == 0) {
 			JOptionPane.showMessageDialog(frame, "Topic name must have at least one alphanumeric character");
 		} else if (StringUtils.isBlank(topicName)) {
 			JOptionPane.showMessageDialog(frame, "Topic name cannot be blank");
@@ -124,17 +125,15 @@ public class MainMenuController {
 		JMSTopic topic = topicService.getTopicById(topicId);
 
 		if (topic != null) {
-			if (user.equals(topic.getOwner())) {
-				// If the topic exists, and the current user owns it, delete the
-				// topic.
-				topicService.deleteTopic(topic);
-			} else {
-				// If the topic exists, and the current user does NOT own it,
-				// show an error message.
+			// If the topic exists, attempt deletion
+			try {
+				topicService.deleteTopic(topic, user);
+			} catch (AccessDeniedException e) {
 				JOptionPane.showInternalMessageDialog(frame,
 						"Failed to delete topic.  " + "You are not the topic owner", "Topic Deletion Failed",
 						JOptionPane.ERROR_MESSAGE, null);
 			}
+
 		} else {
 			// If the topic does not exist, show an error message.
 			JOptionPane.showInternalMessageDialog(frame,
@@ -190,7 +189,7 @@ public class MainMenuController {
 		removeUserFromAllTopics();
 
 		// Hide this window so its overridden dispose method isn't called (this
-		// would cause an infinite loop)		
+		// would cause an infinite loop)
 		frame.setVisible(false);
 		disposeAllVisibleWindows();
 

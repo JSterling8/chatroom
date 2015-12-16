@@ -1,6 +1,7 @@
 package services;
 
 import java.io.Serializable;
+import java.nio.file.AccessDeniedException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.UUID;
@@ -62,8 +63,10 @@ public class TopicService implements Serializable {
 	 * @param topic
 	 * @throws Exception
 	 */
-	public void createTopic(JMSTopic topic) throws Exception {
+	public Lease createTopic(JMSTopic topic)
+			throws DuplicateEntryException, InvalidAttributeValueException, RemoteException, TransactionException {
 		Transaction transaction = TransactionHelper.getTransaction(3000);
+		Lease lease = null;
 
 		try {
 			// If the topic is valid (non-null name, base name, and ID)
@@ -71,7 +74,7 @@ public class TopicService implements Serializable {
 				// If the topic does not already exist in the space
 				if (!topicExistsInSpace(topic, transaction)) {
 					// Write it to the space and commit the transaction
-					space.write(topic, transaction, Lease.FOREVER);
+					lease = space.write(topic, transaction, Lease.FOREVER);
 					transaction.commit();
 				} else {
 					// Otherwise it's a duplicate, so throw an exception
@@ -82,8 +85,7 @@ public class TopicService implements Serializable {
 				// Otherwise the Topic object is invalid, so throw an exception
 				throw new InvalidAttributeValueException("Topic being creates is invalid (one or more fields null)");
 			}
-
-		} catch (Exception e) {
+		} catch (DuplicateEntryException | InvalidAttributeValueException | RemoteException | TransactionException e) {
 			// If anything in the try block throws an error, abort the
 			// transaction before rethrowing the error
 			if (transaction != null) {
@@ -97,13 +99,16 @@ public class TopicService implements Serializable {
 
 			throw e;
 		}
+
+		return lease;
 	}
 
 	/**
 	 * Used for testing and ensuring space isn't left cluttered. Returns lease
-	 * so it can be removed easily from the space.  No validity checks are made
+	 * so it can be removed easily from the space. No validity checks are made
 	 * 
-	 * @param topic The topic to create
+	 * @param topic
+	 *            The topic to create
 	 * @return The topic's lease
 	 */
 	public Lease createDebugTopic(JMSTopic topic) throws RemoteException, TransactionException {
@@ -202,30 +207,37 @@ public class TopicService implements Serializable {
 	 * 
 	 * @param topic
 	 *            The topic to delete
+	 * @param userRequestingDeletion
+	 *            The user who requested the topic be deleted
+	 * @throws AccessDeniedException 
 	 */
-	public void deleteTopic(JMSTopic topic) {
+	public void deleteTopic(JMSTopic topic, JMSUser userRequestingDeletion) throws AccessDeniedException {
+		if (userRequestingDeletion.equals(topic.getOwner())) {
+			// If the topic does not contain null fields
+			if (isValidTopic(topic)) {
+				try {
+					Transaction transaction = TransactionHelper.getTransaction(10000l);
 
-		// If the topic does not contain null fields
-		if (isValidTopic(topic)) {
-			try {
-				Transaction transaction = TransactionHelper.getTransaction(10000l);
+					space.takeIfExists(topic, transaction, 3000l);
 
-				space.takeIfExists(topic, transaction, 3000l);
+					deleteAllTopicUsers(topic, transaction);
+					MessageService.getMessageService().deleteAllTopicMessages(topic, transaction);
 
-				deleteAllTopicUsers(topic, transaction);
-				MessageService.getMessageService().deleteAllTopicMessages(topic, transaction);
+					// Writes a JMSTopicDeleted object so listeners know the
+					// topic
+					// has been removed
+					space.write(new JMSTopicDeleted(topic), transaction, 1000l * 60l);
 
-				// Writes a JMSTopicDeleted object so listeners know the topic
-				// has been removed
-				space.write(new JMSTopicDeleted(topic), transaction, 1000l * 60l);
-
-				transaction.commit();
-			} catch (Exception e) {
-				e.printStackTrace();
+					transaction.commit();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.err.println("Attempted to delete topic with on or more null fields.  "
+						+ "Due to how JavaSpaces work, this will delete one at random and is not allowed.");
 			}
 		} else {
-			System.err.println("Attempted to delete topic with on or more null fields.  "
-					+ "Due to how JavaSpaces work, this will delete one at random and is not allowed.");
+			throw new AccessDeniedException("Only the topic's owner can delete the topic");
 		}
 	}
 
@@ -249,15 +261,16 @@ public class TopicService implements Serializable {
 	 * @param user
 	 *            The user to add to the topic
 	 */
-	public void addTopicUser(JMSTopic topic, JMSUser user) {
+	public Lease addTopicUser(JMSTopic topic, JMSUser user) {
 		JMSTopicUser topicUser = new JMSTopicUser(topic, user);
-
+		Lease lease = null;
+		
 		try {
 			Transaction transaction = TransactionHelper.getTransaction();
 
 			// Only add the TopicUser if it isn't already in there...
 			if (space.readIfExists(topicUser, transaction, 1000) == null) {
-				space.write(topicUser, transaction, Lease.FOREVER);
+				lease = space.write(topicUser, transaction, Lease.FOREVER);
 			}
 
 			transaction.commit();
@@ -265,14 +278,18 @@ public class TopicService implements Serializable {
 			System.err.println("Failed to add user to topic");
 			e.printStackTrace();
 		}
+		
+		return lease;
 	}
-	
+
 	/**
 	 * Used for testing and ensuring space isn't left cluttered. Returns lease
-	 * so it can be removed easily from the space.  No validity checks are made
+	 * so it can be removed easily from the space. No validity checks are made
 	 * 
-	 * @param topic The topic to create a JMSTopicUser for
-	 * @param user User to create JMSTopicUser for
+	 * @param topic
+	 *            The topic to create a JMSTopicUser for
+	 * @param user
+	 *            User to create JMSTopicUser for
 	 * @return The JMSTopicUser's lease
 	 */
 	public Lease addDebugTopicUser(JMSTopic topic, JMSUser user) throws RemoteException, TransactionException {
@@ -380,7 +397,8 @@ public class TopicService implements Serializable {
 	 *         <code>false</code>
 	 */
 	private boolean isValidTopic(JMSTopic topic) {
-		if (topic.getBaseName() != null && StringUtils.isNotBlank(topic.getName()) && topic.getId() != null) {
+		if (StringUtils.isNotBlank(topic.getBaseName()) && StringUtils.isNotBlank(topic.getName())
+				&& topic.getId() != null) {
 			return true;
 		}
 
