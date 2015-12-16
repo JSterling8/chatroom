@@ -17,20 +17,14 @@ import org.junit.Test;
 import exceptions.ResourceNotFoundException;
 import models.JMSMessage;
 import models.JMSTopic;
-import models.JMSTopicUser;
 import models.JMSUser;
 import net.jini.core.lease.Lease;
 import net.jini.core.lease.UnknownLeaseException;
-import net.jini.space.JavaSpace05;
 import services.MessageService;
-import services.SpaceService;
 import services.TopicService;
 import services.UserService;
-import services.helper.EntryLookupHelper;
 
 public class MessageServiceTest {
-	private JavaSpace05 space;
-	private EntryLookupHelper lookupHelper;
 	private JMSUser user;
 	private JMSTopic topic;
 	private JMSMessage message;
@@ -47,11 +41,9 @@ public class MessageServiceTest {
 		topic = new JMSTopic("$$$", user);
 		message = new JMSMessage(topic, new Date(), user, null, UUID.randomUUID(), "sfsdf");
 
-		space = SpaceService.getSpace();
 		messageService = MessageService.getMessageService();
 		topicService = TopicService.getTopicService();
 		userService = UserService.getUserService();
-		lookupHelper = new EntryLookupHelper();
 
 		leases = new ArrayList<Lease>();
 	}
@@ -71,7 +63,7 @@ public class MessageServiceTest {
 	public void checkNonExistantTopicCantHaveMessageSent() {
 		boolean failedAsExpected = false;
 		try {
-			messageService.sendMessage(message);
+			leases.add(messageService.sendMessage(message));
 		} catch (RemoteException e) {
 			failedAsExpected = false;
 		} catch (ResourceNotFoundException e) {
@@ -87,7 +79,7 @@ public class MessageServiceTest {
 		boolean failedAsExpected = false;
 		try {
 			message.setTopic(null);
-			messageService.sendMessage(message);
+			leases.add(messageService.sendMessage(message));
 		} catch (RemoteException e) {
 			failedAsExpected = false;
 		} catch (ResourceNotFoundException e) {
@@ -137,20 +129,20 @@ public class MessageServiceTest {
 		JMSUser userTo = new JMSUser("@@@", "@@@");
 		JMSUser userRandom = new JMSUser("£££", "£££");
 
-		int numPrivatemessagesToSend = 10;
-		
+		int numPrivateMessagesToSend = 10;
+
 		try {
 			leases.add(topicService.createDebugTopic(topic));
-			
+
 			leases.add(userService.createDebugUser(userTo));
 			leases.add(userService.createDebugUser(userFrom));
 			leases.add(userService.createDebugUser(userRandom));
-			
+
 			leases.add(topicService.addDebugTopicUser(topic, userFrom));
 			leases.add(topicService.addDebugTopicUser(topic, userTo));
 			leases.add(topicService.addDebugTopicUser(topic, userRandom));
 
-			for (int i = 0; i < numPrivatemessagesToSend; i++) {
+			for (int i = 0; i < numPrivateMessagesToSend; i++) {
 				message = new JMSMessage(topic, new Date(), userFrom, userTo, UUID.randomUUID(), "test message");
 				messagesToPutInSpace.add(message);
 
@@ -160,10 +152,10 @@ public class MessageServiceTest {
 			List<JMSMessage> messagesForRandomUser = messageService.getAllMessagesForUserInTopic(topic, userRandom);
 			List<JMSMessage> messagesForToUser = messageService.getAllMessagesForUserInTopic(topic, userTo);
 			List<JMSMessage> messagesForFromUser = messageService.getAllMessagesForUserInTopic(topic, userFrom);
-			
+
 			assertEquals(0, messagesForRandomUser.size());
-			assertEquals(numPrivatemessagesToSend, messagesForToUser.size());
-			assertEquals(numPrivatemessagesToSend, messagesForFromUser.size());
+			assertEquals(numPrivateMessagesToSend, messagesForToUser.size());
+			assertEquals(numPrivateMessagesToSend, messagesForFromUser.size());
 		} catch (Exception e) {
 			fail("Failed to put Entries in space for test.");
 
@@ -171,5 +163,37 @@ public class MessageServiceTest {
 		}
 	}
 
-	// Check pm only to user who is currently in topic
+	@Test
+	public void testMessageToUserNotInTopicFails() {
+		JMSUser userFrom = user;
+		JMSUser userTo = new JMSUser("@@@", "@@@");
+		
+		boolean expectedExceptionThrown = false;
+		
+		try {
+			leases.add(topicService.createDebugTopic(topic));
+
+			leases.add(userService.createDebugUser(userFrom));
+			leases.add(userService.createDebugUser(userTo));
+
+			leases.add(topicService.addDebugTopicUser(topic, userFrom));
+
+			message = new JMSMessage(topic, new Date(), userFrom, userTo, UUID.randomUUID(), "test message");
+		} catch (Exception e) {
+			fail("Failed to put Entries in space for test.");
+			
+			return;
+		}
+		
+		try {
+			messageService.sendMessage(message);
+		} catch (RemoteException | ResourceNotFoundException e) {
+			expectedExceptionThrown = true;
+			
+			List<JMSMessage> messagesForToUser = messageService.getAllMessagesForUserInTopic(topic, userTo);
+			assertEquals(0, messagesForToUser.size());
+		}
+		
+		assertTrue(expectedExceptionThrown);
+	}
 }
