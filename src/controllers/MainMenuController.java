@@ -185,8 +185,10 @@ public class MainMenuController {
 				Frame[] frames = Frame.getFrames();
 
 				for (Frame frame : frames) {
-					frame.setVisible(false);
-					frame.dispose();
+					if(frame.isVisible()){
+						frame.setVisible(false);
+						frame.dispose();
+					}
 				}
 
 				new LoginFrame();

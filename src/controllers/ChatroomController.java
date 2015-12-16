@@ -44,7 +44,7 @@ import views.ChatroomFrame;
 import views.ColoredTable;
 
 /**
- * Controls a given ChatroomFrame.
+ * Controls a given ChatroomFrame for a given user and topic.
  * 
  * @author Jonathan Sterling
  *

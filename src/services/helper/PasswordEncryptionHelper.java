@@ -19,8 +19,8 @@ import javax.crypto.spec.PBEKeySpec;
 public class PasswordEncryptionHelper {
 	private static final String ENCRYPTION_ALGORITHM = "PBKDF2WithHmacSHA512";
 
-	private static final int BYTES_IN_SALT = 128;
-	private static final int BYTES_IN_HASH = 128;
+	private static final int BYTES_IN_SALT = 512;
+	private static final int BYTES_IN_HASH = 512;
 	private static final int ITERATIONS = 5000;
 
 	private static final int SALT_INDEX = 0;
@@ -28,16 +28,18 @@ public class PasswordEncryptionHelper {
 	private static final int HASH_INDEX = 2;
 
 	private PasswordEncryptionHelper() {
+		// Uninstantiable...
 	}
 
 	/**
-	 * Takes in a given password and encrypts it using the "PBKDF2WithHmacSHA1"
-	 * algorithm
+	 * Takes in a given password and encrypts it using the
+	 * "PBKDF2WithHmacSHA512" algorithm
 	 * 
 	 * @param password
-	 * @return
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
+	 *            The password to encrypt
+	 * 
+	 * @return A colon-delimited String containing the salt, iterations, and
+	 *         hashed password
 	 */
 	public static String encryptPassword(char[] password) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		// Generate a random salt
@@ -45,11 +47,26 @@ public class PasswordEncryptionHelper {
 		byte[] salt = new byte[BYTES_IN_SALT];
 		random.nextBytes(salt);
 
+		// Create the hashed password
 		byte[] hash = createHash(password, salt, ITERATIONS, BYTES_IN_HASH);
 
+		// Return the salt, iterations, and hashed password in a colon delimited
+		// String
 		return toHex(salt) + ":" + ITERATIONS + ":" + toHex(hash);
 	}
 
+	/**
+	 * Given a password, salt, iteration #, and byte #, returns a byte array
+	 * containing the encrypted password
+	 * 
+	 * @param password The password to encrypt
+	 * @param salt The salt to use to encrypt the password
+	 * @param iterations The iteration count
+	 * @param bytes
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 */
 	private static byte[] createHash(char[] password, byte[] salt, int iterations, int bytes)
 			throws NoSuchAlgorithmException, InvalidKeySpecException {
 		PBEKeySpec keySpec = new PBEKeySpec(password, salt, iterations, bytes * 8);
