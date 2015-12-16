@@ -121,14 +121,23 @@ public class LoginController {
 					user.setName(username);
 					user.setId(UUID.randomUUID());
 
-					userService.createUser(user);
+					if (user.getBaseName().length() == 0) {
+						// This is because the base name of "$$$$$" is the same
+						// as the base name of "@@@@@" or any other all special
+						// character name
+						// Special-character-only names are useful for testing
+						JOptionPane.showMessageDialog(loginFrame, "Name must have at least one alphanumeric character");
+					} else {
+						userService.createUser(user);
 
-					// Log the newly created user in by disposing of the login
-					// frame and showing the main menu
-					loginFrame.setVisible(false);
-					loginFrame.dispose();
+						// Log the newly created user in by disposing of the
+						// login
+						// frame and showing the main menu
+						loginFrame.setVisible(false);
+						loginFrame.dispose();
 
-					new MainMenuFrame(user);
+						new MainMenuFrame(user);
+					}
 				} catch (NoSuchAlgorithmException | InvalidKeySpecException | RemoteException
 						| TransactionException e) {
 					// If the password encryption failed, throw an error, print

@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.lang3.StringUtils;
@@ -70,7 +68,12 @@ public class MainMenuController {
 	public void handleCreateButtonPressed() {
 		// Ask the user for a topic name.
 		String topicName = JOptionPane.showInputDialog(frame, "Enter a topic name: ");
-		if (StringUtils.isNotBlank(topicName)) {
+		
+		if(topicName.replaceAll("[^A-Za-z0-9]", "").length() == 0) {
+			JOptionPane.showMessageDialog(frame, "Topic name must have at least one alphanumeric character");
+		} else if (StringUtils.isBlank(topicName)) {
+			JOptionPane.showMessageDialog(frame, "Topic name cannot be blank");
+		} else {
 			// Create the topic.
 			createTopic(topicName);
 		}

@@ -87,6 +87,4 @@ public class JMSMessage implements Entry {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-
-	
 }
