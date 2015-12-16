@@ -32,6 +32,7 @@ import net.jini.jeri.tcp.TcpServerEndpoint;
 import net.jini.space.JavaSpace05;
 import services.SpaceService;
 import services.TopicService;
+import services.helper.EntryLookupHelper;
 import views.ChatroomFrame;
 import views.LoginFrame;
 import views.MainMenuFrame;
@@ -46,10 +47,10 @@ public class MainMenuController {
 	private static TopicService topicService = TopicService.getTopicService();
 
 	private MainMenuFrame frame;
-	private DefaultTableModel tableModel;
+	private DefaultTableModel topicsTableModel;
 	private JMSUser user;
-	private RemoteEventListener topicAddedStub;
-	private RemoteEventListener topicRemovedStub;
+	private RemoteEventListener topicAddedListenerStub;
+	private RemoteEventListener topicRemovedListenerStub;
 	private EventRegistration topicAddedRegistration;
 	private EventRegistration topicRemovedRegistration;
 
@@ -88,7 +89,8 @@ public class MainMenuController {
 			// Check if this user already has a chat window open for this topic
 			for (JMSTopicUser topicUser : topicUsers) {
 				if (topicUser.getUser().equals(user)) {
-					JOptionPane.showMessageDialog(frame, "You are already in this topic");
+					JOptionPane.showMessageDialog(frame,
+							"You are already in this topic.  If you are not, try logging out then back in to continue.");
 
 					return;
 				}
@@ -161,9 +163,9 @@ public class MainMenuController {
 		}
 
 		// Generate a table model from the array of arrays.
-		tableModel = new DefaultTableModel(data, columns);
+		topicsTableModel = new DefaultTableModel(data, columns);
 
-		return tableModel;
+		return topicsTableModel;
 	}
 
 	/**
@@ -172,7 +174,7 @@ public class MainMenuController {
 	 * @return The DefaultTableModel of topics
 	 */
 	public DefaultTableModel getTopicTableModel() {
-		return tableModel;
+		return topicsTableModel;
 	}
 
 	/**
@@ -180,12 +182,13 @@ public class MainMenuController {
 	 * closes the main menu, and opens a new login window
 	 */
 	public void logout() {
+		// Close all of the windows
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				Frame[] frames = Frame.getFrames();
 
 				for (Frame frame : frames) {
-					if(frame.isVisible()){
+					if (frame.isVisible()) {
 						frame.setVisible(false);
 						frame.dispose();
 					}
@@ -194,6 +197,17 @@ public class MainMenuController {
 				new LoginFrame();
 			}
 		});
+
+		// Remove user from all topics, if they're in them. This is effectively
+		// so if a user crashes out, they can reset their state in all topics by
+		// logging in then back out again
+		EntryLookupHelper lookupHelper = new EntryLookupHelper();
+		JMSTopicUser thisUser = new JMSTopicUser();
+		thisUser.setUser(user);
+		List<JMSTopicUser> topicUsers = lookupHelper.findAllMatchingTemplate(SpaceService.getSpace(), thisUser);
+		for (JMSTopicUser topicUser : topicUsers) {
+			TopicService.getTopicService().removeTopicUser(topicUser.getTopic(), topicUser.getUser());
+		}
 	}
 
 	/**
@@ -215,8 +229,8 @@ public class MainMenuController {
 	 *            A JTable to show the topics in.
 	 */
 	public void updateTopicList(JTable table) {
-		tableModel = generateTopicTableModel();
-		table.setModel(tableModel);
+		topicsTableModel = generateTopicTableModel();
+		table.setModel(topicsTableModel);
 		table.removeColumn(table.getColumnModel().getColumn(MainMenuFrame.COLUMN_INDEX_OF_TOPIC_ID));
 		table.removeColumn(table.getColumnModel().getColumn(MainMenuFrame.COLUMN_INDEX_OF_TOPIC_OWNER_ID));
 	}
@@ -235,9 +249,9 @@ public class MainMenuController {
 					false, true);
 
 			TopicAddedRemoteEventListener eventListener = new TopicAddedRemoteEventListener(this);
-			topicAddedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+			topicAddedListenerStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 
-			topicAddedRegistration = space.registerForAvailabilityEvent(templates, null, true, topicAddedStub,
+			topicAddedRegistration = space.registerForAvailabilityEvent(templates, null, true, topicAddedListenerStub,
 					Lease.FOREVER, null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new topic(s)");
@@ -262,10 +276,10 @@ public class MainMenuController {
 			// register this as a remote object
 			// and get a reference to the 'stub'
 			TopicRemovedRemoteEventListener eventListener = new TopicRemovedRemoteEventListener(this);
-			topicRemovedStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
+			topicRemovedListenerStub = (RemoteEventListener) myDefaultExporter.export(eventListener);
 
-			topicRemovedRegistration = space.registerForAvailabilityEvent(templates, null, true, topicRemovedStub,
-					Lease.FOREVER, null);
+			topicRemovedRegistration = space.registerForAvailabilityEvent(templates, null, true,
+					topicRemovedListenerStub, Lease.FOREVER, null);
 		} catch (TransactionException | IOException e) {
 			System.err.println("Failed to get new topic(s)");
 			e.printStackTrace();
