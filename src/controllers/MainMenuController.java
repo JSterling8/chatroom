@@ -183,11 +183,12 @@ public class MainMenuController {
 	 * closes the main menu, and opens a new login window
 	 */
 	public void logout() {
-		frame.setVisible(false);
-
 		cancelLeases();
 		removeUserFromAllTopics();
-		disposeAllWindows();
+		
+		// Hide this window so its overridden dispose method isn't called.
+		frame.setVisible(false);
+		disposeAllVisibleWindows();
 
 		frame.superDispose();
 
@@ -204,7 +205,7 @@ public class MainMenuController {
 
 		cancelLeases();
 		removeUserFromAllTopics();
-		disposeAllWindows();
+		disposeAllVisibleWindows();
 
 		System.exit(0);
 	}
@@ -212,7 +213,7 @@ public class MainMenuController {
 	/**
 	 * Disposes all visible windows
 	 */
-	private void disposeAllWindows() {
+	private void disposeAllVisibleWindows() {
 
 		Frame[] frames = Frame.getFrames();
 
