@@ -43,8 +43,8 @@ public class UserServiceTest {
 					lease.cancel();
 				}
 			} catch (UnknownLeaseException | RemoteException e) {
-				// Ignore. Some leases are not cancelled because they are
-				// deleted elsewhere
+				// Ignore. Some leases are not deleted/cancelled because they are
+				// deleted/cancelled elsewhere
 			}
 		}
 	}
